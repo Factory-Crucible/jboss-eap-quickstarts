@@ -15,28 +15,24 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>org.jboss</groupId>
-        <artifactId>jboss-parent</artifactId>
-        <version>39</version>
-    </parent>
-
-    <groupId>org.jboss.eap.quickstarts</groupId>
-    <artifactId>quickstart-aggregator</artifactId>
-    <!--
+        <groupId>org.jboss.eap.quickstarts</groupId>
+        <artifactId>jboss-eap-quickstart-parent</artifactId>
+        <!--
         Maintain separation between the artifact id and the version to help prevent
         merge conflicts between commits changing the GA and those changing the V.
         -->
+        <version>6.0.0.redhat-00001</version>
+        <relativePath/>
+    </parent>
+    <artifactId>kitchensink</artifactId>
     <version>8.0.0.GA</version>
-
-    <packaging>pom</packaging>
-
-    <name>Quickstart: Aggregator</name>
-    <description>Quickstart's aggregator</description>
-    <url>https://github.com/jboss-developer/jboss-eap-quickstarts</url>
+    <packaging>war</packaging>
+    <name>Quickstart: kitchensink</name>
+    <description>A starter Jakarta EE web application project for use in JBoss EAP</description>
 
     <licenses>
         <license>
@@ -47,23 +43,9 @@
     </licenses>
 
     <properties>
-        <root.dir>${project.basedir}</root.dir>
-        <jboss.home.name>EAP8_HOME</jboss.home.name>
-        <product.name>JBoss EAP</product.name>
-        <product.version>8.0.0.GA</product.version>
-        <!-- A base list of dependency and plug-in version used in the various quick starts. -->
-        <version.org.asciidoctor.asciidoctor-maven-plugin>2.1.0</version.org.asciidoctor.asciidoctor-maven-plugin>
+        <!-- The versions for BOMs, Dependencies and Plugins -->
+        <version.server.bom>8.0.0.GA-redhat-00009</version.server.bom>
         <version.eap.maven.plugin>1.0.0.Final-redhat-00014</version.eap.maven.plugin>
-        <version.org.wildfly.checkstyle-config>1.0.7.Final</version.org.wildfly.checkstyle-config>
-        <version.org.wildfly.quickstarts.documentation.plugin>2.3.0.Final</version.org.wildfly.quickstarts.documentation.plugin>
-        <!-- other plug-in versions -->
-        <version.com.mycyla.license>3.0</version.com.mycyla.license>
-        <version.checkstyle>8.5</version.checkstyle>
-        <!-- Explicitly declaring the source encoding eliminates the following
-            message: [WARNING] Using platform encoding (UTF-8 actually) to copy
-            filtered resources, i.e. build is platform dependent! -->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <linkXRef>false</linkXRef>
     </properties>
 
     <repositories>
@@ -123,256 +105,183 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <build>
-        <!-- Set the name of the WAR, used as the context root when the app is deployed. -->
-        <finalName>${project.artifactId}</finalName>
-        <plugins>
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>${version.com.mycyla.license}</version>
-                <configuration>
-                    <header>${basedir}/dist/license.txt</header>
-                    <aggregate>true</aggregate>
-                    <strictCheck>true</strictCheck>
-                    <excludes>
-                        <exclude>target/**</exclude>
-                        <exclude>.clover/**</exclude>
-                        <exclude>**/*.sql</exclude>
-                        <exclude>**/LICENSE*</exclude>
-                        <exclude>**/license*</exclude>
-                        <!-- Javascrip Libraries -->
-                        <exclude>**/jquery*</exclude>
-                        <exclude>**/angular*</exclude>
-                        <exclude>**/qunit*</exclude>
-                        <exclude>**/backbone*</exclude>
-                        <exclude>**/lodash*</exclude>
-                        <exclude>**/modernizr*</exclude>
-                        <exclude>**/yepnope*</exclude>
-                        <exclude>**/mobile-nav*</exclude>
-                        <!--Other libraries -->
-                        <exclude>**/*glyphicons*/**</exclude>
-                        <exclude>**/*cordova*/**</exclude>
-                    </excludes>
-                    <encoding>UTF-8</encoding>
-                    <headerDefinitions>
-                        <headerDefinition>dist/headerdefinition.xml</headerDefinition>
-                    </headerDefinitions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-        </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.asciidoctor</groupId>
-                    <artifactId>asciidoctor-maven-plugin</artifactId>
-                    <version>${version.org.asciidoctor.asciidoctor-maven-plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.jboss.eap.plugins</groupId>
-                    <artifactId>eap-maven-plugin</artifactId>
-                    <version>${version.eap.maven.plugin}</version>
-                </plugin>
-                <!-- Checkstyle -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${version.checkstyle.plugin}</version>
-                    <configuration>
-                        <configLocation>wildfly-checkstyle/checkstyle.xml</configLocation>
-                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <sourceDirectories>
-                            <directory>${project.build.sourceDirectory}</directory>
-                        </sourceDirectories>
-                        <resourceIncludes>**/*.properties,**/*.xml</resourceIncludes>
-                        <includeTestResources>true</includeTestResources>
-                        <includeResources>true</includeResources>
-                        <consoleOutput>true</consoleOutput>
-                        <failsOnError>true</failsOnError>
-                        <failOnViolation>true</failOnViolation>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.wildfly.checkstyle</groupId>
-                            <artifactId>wildfly-checkstyle-config</artifactId>
-                            <version>${version.org.wildfly.checkstyle-config}</version>
-                        </dependency>
-                    </dependencies>
-                    <executions>
-                        <execution>
-                            <id>check-style</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>checkstyle</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            com.redhat.rcm.maven.plugin
-                                        </groupId>
-                                        <artifactId>
-                                            buildmetadata-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [1.7.0,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>
-                                                provide-buildmetadata
-                                            </goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore></ignore>
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            org.commonjava.maven.plugins
-                                        </groupId>
-                                        <artifactId>
-                                            project-sources-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [0.3,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>archive</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore></ignore>
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            org.jboss.ws.plugins
-                                        </groupId>
-                                        <artifactId>
-                                            jaxws-tools-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [1.2.0.Final,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>wsconsume</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore></ignore>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+    <dependencyManagement>
+        <dependencies>
+            <!-- importing the ee-with-tools BOM adds specs and other useful artifacts as managed dependencies -->
+            <dependency>
+                <groupId>org.jboss.bom</groupId>
+                <artifactId>jboss-eap-ee-with-tools</artifactId>
+                <version>${version.server.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <!-- First declare the APIs we depend on and need for compilation. All
+        of them are provided by JBoss EAP -->
+
+        <!-- Import the CDI API, we use provided scope as the API is included in
+        JBoss EAP -->
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Needed for running tests (you may also use TestNG) -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Now we declare any tools needed -->
+
+        <!-- Annotation processor to generate the JPA metamodel classes for
+        typesafe criteria queries -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Jakarta Activation needed for JPA model generation -->
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Bean Validation Implementation 
+        Provides portable constraints such as @Email 
+        Hibernate Validator is shipped in JBoss EAP -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- hibernate-validator dependencies excluded on server dependency management yet required -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Annotation processor that raising compilation errors whenever constraint
+        annotations are incorrectly used. -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-annotation-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the JPA API, we use provided scope as the API is included in
+        JBoss EAP -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Optional, but highly recommended -->
+        <!-- Arquillian allows you to test enterprise code such as EJBs and Transactional(JTA)
+        JPA from JUnit/TestNG -->
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet-jakarta</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Import the Common Annotations API (JSR-250), we use provided scope
+        as the API is included in JBoss EAP -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the EJB API, we use provided scope as the API is included in
+        JBoss EAP -->
+        <dependency>
+            <groupId>jakarta.ejb</groupId>
+            <artifactId>jakarta.ejb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the JSF API, we use provided scope as the API is included in
+        JBoss EAP -->
+        <dependency>
+            <groupId>jakarta.faces</groupId>
+            <artifactId>jakarta.faces-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the JAX-RS API, we use provided scope as the API is included
+        in JBoss EAP -->
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.parsson</groupId>
+            <artifactId>parsson</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 
     <profiles>
         <profile>
-            <!-- All the modules that require nothing but JBoss Enterprise
-                    Application Platform or JBoss EAP -->
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>default</name>
-                    <value>!disabled</value>
-                </property>
-            </activation>
-            <modules>
-                <!-- All the modules that require nothing but JBoss Enterprise
-                    Application Platform or JBoss EAP -->
-                <module>cmt</module>
-                <module>ee-security</module>
-                <module>helloworld</module>
-                <module>helloworld-ws</module>
-                <module>jaxrs-client</module>
-                <module>kitchensink</module>
-                <module>numberguess</module>
-                <module>remote-helloworld-mdb</module>
-                <module>servlet-security</module>
-                <module>temperature-converter</module>
-                <module>todo-backend</module>
-                <module>thread-racing</module>
-                <module>websocket-hello</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>docs</id>
-            <activation>
-                <property>
-                    <name>release</name>
-                </property>
-            </activation>
+            <!-- An optional Arquillian testing profile that executes tests in a remote JBoss EAP instance.
+            Run with: mvn clean verify -Parq-remote -->
+            <id>arq-remote</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly.arquillian</groupId>
+                    <artifactId>wildfly-arquillian-container-remote</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.wildfly.maven.plugins</groupId>
-                        <artifactId>quickstart-documentation-plugin</artifactId>
-                        <version>${version.org.wildfly.quickstarts.documentation.plugin}</version>
-                        <inherited>false</inherited>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${version.failsafe.plugin}</version>
                         <configuration>
-                            <rootDirectory>.</rootDirectory>
-                            <targetDocument>README.adoc</targetDocument>
+                            <includes>
+                                <include>**/RemoteMemberRegistrationIT</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/MemberRegistrationIT</exclude>
+                            </excludes>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>generate-toc</id>
-                                <phase>generate-resources</phase>
                                 <goals>
-                                    <goal>table-of-contents</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.asciidoctor</groupId>
-                        <artifactId>asciidoctor-maven-plugin</artifactId>
-                        <configuration>
-                            <backend>html5</backend>
-                            <attributes>
-                                <artifactId>${project.artifactId}</artifactId>
-                            </attributes>
-                            <resources>
-                                <resource>
-                                    <directory>.</directory>
-                                    <excludes>
-                                        <exclude>**/*</exclude>
-                                    </excludes>
-                                </resource>
-                            </resources>
-                            <doctype>article</doctype>
-                            <sourceDirectory>.</sourceDirectory>
-                            <sourceDocumentName>README.adoc</sourceDocumentName>
-                            <outputFile>README.html</outputFile>
-                            <outputDirectory>.</outputDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>output-html</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>process-asciidoc</goal>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
                                 </goals>
                             </execution>
                         </executions>
@@ -381,26 +290,49 @@
             </build>
         </profile>
         <profile>
-            <id>adoc</id>
-            <activation>
-                <file>
-                    <missing>README.adoc</missing>
-                </file>
-            </activation>
-            <properties>
-                <asciidoctor.skip>true</asciidoctor.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>dist</id>
-            <activation>
-                <property>
-                    <name>release</name>
-                </property>
-            </activation>
-            <modules>
-                <module>dist</module>
-            </modules>
+            <id>openshift</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jboss.eap.plugins</groupId>
+                        <artifactId>eap-maven-plugin</artifactId>
+                        <version>${version.eap.maven.plugin}</version>
+                        <configuration>
+                            <channels>
+                                <channel>
+                                    <manifest>
+                                        <groupId>org.jboss.eap.channels</groupId>
+                                        <artifactId>eap-8.0</artifactId>
+                                    </manifest>
+                                </channel>
+                            </channels>
+                            <feature-packs>
+                                <feature-pack>
+                                    <location>org.jboss.eap:wildfly-ee-galleon-pack</location>
+                                </feature-pack>
+                                <feature-pack>
+                                    <location>org.jboss.eap.cloud:eap-cloud-galleon-pack</location>
+                                </feature-pack>
+                            </feature-packs>
+                            <layers>
+                                <layer>cloud-server</layer>
+                                <layer>h2-driver</layer>
+                                <layer>ejb</layer>
+                                <layer>jsf</layer>
+                            </layers>
+                            <filename>ROOT.war</filename>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
+
 </project>

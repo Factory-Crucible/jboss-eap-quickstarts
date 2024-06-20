@@ -1,3 +1,7 @@
+ifdef::env-github[]
+:artifactId: kitchensink
+endif::[]
+
 //***********************************************************************************
 // Enable the following flag to build README.html files for JBoss EAP product builds.
 // Comment it out for WildFly builds.
@@ -193,245 +197,677 @@ endif::[]
 :LinkJBDSGettingStarted: https://access.redhat.com/documentation/en-us/red_hat_codeready_studio/{JBDSVersion}/html-single/getting_started_with_codeready_studio_tools/
 :JBDSGettingStartedBookName: Getting Started with CodeReady Studio Tools
 
-:toc:
-:toclevels: 4
-:numbered:
+= kitchensink: Assortment of technologies including Arquillian
+:author: Pete Muir
+:level: Intermediate
+:technologies: CDI, JSF, JPA, EJB, JAX-RS, BV
+:openshift: true
+
+[abstract]
+The `kitchensink` quickstart demonstrates a {javaVersion} web-enabled database application using JSF, CDI, EJB, JPA, and Bean Validation.
+
+:standalone-server-type: default
+:archiveType: war
+:uses-h2:
+:uses-ds-xml:
+
+== What is it?
+
+The `kitchensink` quickstart is a deployable Maven 3 project designed to help you get your foot in the door developing with {javaVersion} on {productNameFull}.
+
+It demonstrates how to create a compliant {javaVersion} application using JSF, CDI, JAX-RS, EJB, JPA, and Bean Validation. It also includes a persistence unit and some sample persistence and transaction code to introduce you to database access in enterprise Java.
+
+// Considerations for Use in a Production Environment
+:leveloffset: +1
+
+[[considerations_for_use_in_a_production_environment]]
+= Considerations for Use in a Production Environment
+//******************************************************************************
+// Include this template if your quickstart:
+// * Uses the h2 database: Be sure to define the `uses-h2` attribute.
+// * Uses an `*-ds.xml file`: Be sure to define the `uses-ds-xml` attribute.
+// * Has performance or scalability concerns: Be sure to define the `uses-ds-xml` attribute.
+//******************************************************************************
+
+ifdef::uses-h2[]
+
+H2 Database:: This quickstart uses the H2 database included with {productNameFull} {productVersion}. It is a lightweight, relational example datasource that is used for examples only. It is not robust or scalable, is not supported, and should NOT be used in a production environment.
+
+endif::uses-h2[]
+
+ifdef::uses-ds-xml[]
+
+Datasource Configuration File:: This quickstart uses a `*-ds.xml` datasource configuration file for convenience and ease of database configuration. These files are deprecated in {productName} and should not be used in a production environment. Instead, you should configure the datasource using the Management CLI or Management Console. Datasource configuration is documented in the {LinkConfigGuide}[__{ConfigBookName}__].
+
+endif::uses-ds-xml[]
+
+ifdef::performance-scalability[]
+
+Performance and Scalability:: A Jakarta EE container is designed with robustness in mind, so you should carefully analyze the scalabiltiy, concurrency, and performance needs of your application before taking advantage of these techniques in your own applications.
+
+endif::performance-scalability[]
+
+:leveloffset!:
+// System Requirements
+:leveloffset: +1
+
+[[system_requirements]]
+= System Requirements
+//******************************************************************************
+// Include this template to describe the standard system requirements for
+// running the quickstarts.
+//
+// The Forge quickstarts define a `forge-from-scratch` attribute because they
+// run entirely in CodeReady Studio and have different requirements .
+//******************************************************************************
+
+The application this project produces is designed to be run on {productNameFull} {productVersion} or later.
+
+All you need to build this project is {buildRequirements}. See link:{configureMavenDocUrl}[Configure Maven to Build and Deploy the Quickstarts] to make sure you are configured correctly for testing the quickstarts.
+
+:leveloffset!:
+//  Use of {jbossHomeName}
+:leveloffset: +1
+
+ifdef::requires-multiple-servers[]
+[[use_of_jboss_home_name]]
+= Use of the {jbossHomeName}_1, {jbossHomeName}_2, and QUICKSTART_HOME Variables
+
+This quickstart requires that you clone your `__{jbossHomeName}__` installation directory and run two servers. The installation path is described in detail here: link:{useProductHomeDocUrl}[Use of __{jbossHomeName}__ and __JBOSS_HOME__ Variables].
+
+In the following instructions, replace `__{jbossHomeName}_1__` with the path to your first {productName} server and replace `__{jbossHomeName}_2__` with the path to your second cloned {productName} server.
+
+When you see the replaceable variable __QUICKSTART_HOME__, replace it with the path to the root directory of all of the quickstarts.
+endif::[]
+
+ifdef::optional-domain-or-multiple-servers[]
+[[use_of_jboss_home_name]]
+= Use of the {jbossHomeName}_1, {jbossHomeName}_2, and QUICKSTART_HOME Variables
+
+When deploying this quickstart to a managed domain, replace `__{jbossHomeName}__` with the actual path to your {productName} installation. The installation path is described in detail here: link:{useProductHomeDocUrl}[Use of __{jbossHomeName}__ and __JBOSS_HOME__ Variables].
+
+When deploying this quickstart to multiple standalone servers, this quickstart requires that you clone your `__{jbossHomeName}__` installation directory and run two servers. In the following instructions, replace `__{jbossHomeName}_1__` with the path to your first {productName} server and replace `__{jbossHomeName}_2__` with the path to your second cloned {productName} server.
+
+When you see the replaceable variable __QUICKSTART_HOME__, replace it with the path to the root directory of all of the quickstarts.
+endif::[]
+
+ifndef::requires-multiple-servers,optional-domain-or-multiple-servers[]
+[[use_of_jboss_home_name]]
+= Use of the {jbossHomeName} and QUICKSTART_HOME Variables
+
+In the following instructions, replace `__{jbossHomeName}__` with the actual path to your {productName} installation. The installation path is described in detail here: link:{useProductHomeDocUrl}[Use of __{jbossHomeName}__ and __JBOSS_HOME__ Variables].
+
+When you see the replaceable variable __QUICKSTART_HOME__, replace it with the path to the root directory of all of the quickstarts.
+endif::[]
+
+:leveloffset!:
+
+// build and run with standard server distribution
+[[build_and_run_the_quickstart_with_server_dist]]
+== Building and running the quickstart application with a {productName} server distribution
+// Start the {productName} Standalone Server
+:leveloffset: +2
+
+[[start_the_eap_standalone_server]]
+= Start the {productName} Standalone Server
+//******************************************************************************
+// Include this template if your quickstart requires a normal start of a single
+// standalone server.
+//
+// You must define the `standalone-server-type`. Supported values are:
+//    default
+//    full
+//    full-ha
+//    ha
+//    custom
+//
+// * For mobile applications, you can define the `mobileApp` variable in the
+//   `README.adoc` file to add `-b 0.0.0.0` to the command line. This allows
+//    external clients, such as phones, tablets, and desktops, to connect
+//    to the application through through your local network
+//    ::mobileApp: {artifactId}-service
+//
+//******************************************************************************
+
+//******************************************************************************
+// This template sets attributes for the different standalone server profiles.
+//
+// You must define the `standalone-server-type`. Supported values are:
+//    default
+//    full
+//    full-ha
+//    ha
+//    microprofile
+//    custom
+//******************************************************************************
+
+// Standalone server with the default profile.
+ifeval::["{standalone-server-type}"=="default"]
+:serverProfile: default profile
+:configFileName: standalone/configuration/standalone.xml
+:serverArguments:
+endif::[]
+
+// Standalone server with the full profile.
+ifeval::["{standalone-server-type}"=="full"]
+:serverProfile: full profile
+:configFileName: standalone/configuration/standalone-full.xml
+:serverArguments:  -c standalone-full.xml
+endif::[]
+
+// Standalone server with the full HA profile.
+ifeval::["{standalone-server-type}"=="full-ha"]
+:serverProfile: full HA profile
+:configFileName: standalone/configuration/standalone-full-ha.xml
+:serverArguments:  -c standalone-full-ha.xml
+endif::[]
+
+// Start the standalone server with the HA profile.
+ifeval::["{standalone-server-type}"=="ha"]
+:serverProfile: HA profile
+:configFileName: standalone/configuration/standalone-ha.xml
+:serverArguments:  -c standalone-ha.xml
+endif::[]
+
+// Start the standalone server with the Eclipse MicroProfile profile.
+ifeval::["{standalone-server-type}"=="microprofile"]
+:serverProfile: MicroProfile profile
+:configFileName: standalone/configuration/standalone-microprofile.xml
+:serverArguments:  -c standalone-microprofile.xml
+endif::[]
+
+// Standalone server with the custom profile.
+// NOTE: This profile requires that you define the `serverArguments` variable
+// within the quickstart README.adoc file. For example:
+//  :serverArguments: --server-config=../../docs/examples/configs/standalone-xts.xml
+ifeval::["{standalone-server-type}"=="custom"]
+:serverProfile: custom profile
+endif::[]
+
+// If there is no match, use the default profile.
+ifndef::serverProfile[]
+:standalone-server-type:  default
+:serverProfile: default profile
+:configFileName: standalone/configuration/standalone.xml
+:serverArguments:
+endif::serverProfile[]
+
+. Open a terminal and navigate to the root of the {productName} directory.
+. Start the {productName} server with the {serverProfile} by typing the following command.
++
+ifdef::uses-jaeger[]
+[source,subs="+quotes,attributes+",options="nowrap"]
+----
+$ __JAEGER_REPORTER_LOG_SPANS=true JAEGER_SAMPLER_TYPE=const JAEGER_SAMPLER_PARAM=1__ __{jbossHomeName}__/bin/standalone.sh {serverArguments}
+----
+endif::[]
+ifndef::uses-jaeger[]
+[source,subs="+quotes,attributes+",options="nowrap"]
+----
+$ __{jbossHomeName}__/bin/standalone.sh {serverArguments}
+----
+endif::[]
++
+NOTE: For Windows, use the `__{jbossHomeName}__\bin\standalone.bat` script.
+
+ifdef::mobileApp[]
++
+Adding `-b 0.0.0.0` to the above command allows external clients, such as phones, tablets, and desktops, to connect through your local network. For example:
++
+[source,subs="+quotes,attributes+",options="nowrap"]
+----
+$ __{jbossHomeName}__/bin/standalone.sh {serverArguments} -b 0.0.0.0
+----
+endif::[]
+
+:leveloffset!:
+// Build and Deploy the Quickstart
+:leveloffset: +2
+
+[[build_and_deploy_the_quickstart]]
+= Build and Deploy the Quickstart
+//******************************************************************************
+// Include this template if your quickstart does a normal deployment of a archive.
+//
+// * Define the `archiveType` variable in the quickstart README file.
+//   Supported values:
+//    :archiveType: ear
+//    :archiveType: war
+//    :archiveType: jar
+//
+// * To override the archive name, which defaults to the {artifactId),
+//   define the `archiveName` variable, for example:
+//    :archiveName: {artifactId}-service
+//
+// * To override the archive output directory,
+//   define the `archiveDir` variable, for example:
+//    :archiveDir: ear/target
+//
+// * To override the Maven command, define the `mavenCommand` variable,
+//   for example:
+//    :mavenCommand: clean install wildfly:deploy
+//******************************************************************************
+
+// The archive name defaults to the artifactId if not overridden
+ifndef::archiveName[]
+:archiveName: {artifactId}
+endif::archiveName[]
+
+// The archive type defaults to war if not overridden
+ifndef::archiveType[]
+:archiveType: war
+endif::archiveType[]
+
+// Define the archive file name as the concatenation of "archiveName" + "." + "archiveType+
+:archiveFileName: {archiveName}.{archiveType}
+
+// If they have not defined the target archive directory, make it the default for the archive type.
+ifndef::archiveDir[]
+
+ifeval::["{archiveType}"=="ear"]
+:archiveDir: {artifactId}/ear/target
+endif::[]
+
+ifeval::["{archiveType}"=="war"]
+:archiveDir: {artifactId}/target
+endif::[]
+
+ifeval::["{archiveType}"=="jar"]
+:archiveDir: {artifactId}/target
+endif::[]
+
+endif::archiveDir[]
+
+ifndef::mavenCommand[]
+ifeval::["{archiveType}"=="ear"]
+:mavenCommand: clean install
+endif::[]
+
+ifeval::["{archiveType}"=="war"]
+:mavenCommand: clean package
+endif::[]
+
+ifeval::["{archiveType}"=="jar"]
+:mavenCommand: clean install
+endif::[]
+
+endif::mavenCommand[]
+
+. Make sure you xref:start_the_eap_standalone_server[start the {productName} server] as described above.
+. Open a terminal and navigate to the root directory of this quickstart.
+ifdef::reactive-messaging[]
+. Run this command to enable the MicroProfile Reactive Messaging functionality on the server
++
+[source,subs="attributes+",options="nowrap"]
+----
+$ __{jbossHomeName}__/bin/jboss-cli.sh --connect --file=enable-reactive-messaging.cli
+----
+endif::reactive-messaging[]
+. Type the following command to build the quickstart.
++
+[source,subs="attributes+",options="nowrap"]
+----
+$ mvn {mavenCommand}
+----
+
+. Type the following command to deploy the quickstart.
++
+[source,subs="attributes+",options="nowrap"]
+----
+$ mvn wildfly:deploy
+----
+
+ifdef::rest-client-qs[]
+This builds and deploys the `country-server` and `country-client` to the running instance of the server.
+
+You should see a message in the server log indicating that the archives deployed successfully.
+endif::[]
+ifndef::rest-client-qs[]
+This deploys the `{archiveDir}/{archiveFileName}` to the running instance of the server.
+
+You should see a message in the server log indicating that the archive deployed successfully.
+endif::[]
+
+
+:leveloffset!:
+
+=== Access the Application
+
+The application will be running at the following URL: http://localhost:8080/{artifactId}/.
+
+=== Server Log: Expected Warnings and Errors
+
+You will see the following warnings in the server log. You can ignore these warnings.
+
+[source,options="nowrap"]
+----
+WFLYJCA0091: -ds.xml file deployments are deprecated. Support may be removed in a future version.
+----
+
+// Testing with Arquillian
+:leveloffset: +2
+
+[[run_the_arquillian_integration_tests_with_server_distribution]]
+= Run the Arquillian Integration Tests
+//******************************************************************************
+// Include this template if your quickstart provides standard Arquillian
+// integration tests.
+//******************************************************************************
+
+This quickstart includes Arquillian integration tests. They are located under the  `src/test/` directory. The integration tests verify that the quickstart runs correctly when deployed on the server.
+
+Follow these steps to run the integration tests.
+
+. Make sure you start the {productName} server, as previously described.
+
+. Make sure you build and deploy the quickstart, as previously described.
+
+. Type the following command to run the `verify` goal with the `arq-remote` profile activated.
++
+[source,options="nowrap"]
+----
+$ mvn verify -Parq-remote
+----
+
+[NOTE]
+====
+You may also use the environment variable `SERVER_HOST` or the system property `server.host` to define the target host of the tests.
+====
+
+:leveloffset!:
+// Undeploy the Quickstart
+:leveloffset: +2
+
+[[undeploy_the_quickstart]]
+= Undeploy the Quickstart
+
+//*******************************************************************************
+// Include this template if your quickstart does a normal undeployment of an archive.
+//*******************************************************************************
+When you are finished testing the quickstart, follow these steps to undeploy the archive.
+
+. Make sure you xref:start_the_eap_standalone_server[start the {productName} server] as described above.
+. Open a terminal and navigate to the root directory of this quickstart.
+. Type this command to undeploy the archive:
++
+[source,options="nowrap"]
+----
+$ mvn wildfly:undeploy
+----
+
+:leveloffset!:
+
+// Build and run sections for other environments/builds
+ifndef::ProductRelease,EAPXPRelease[]
+include::../shared-doc/build-and-run-the-quickstart-with-provisioned-server.adoc[leveloffset=+1]
+endif::[]
+:leveloffset: +1
+
+[[build_and_run_the_quickstart_on_openshift]]
+= Building and running the quickstart application with OpenShift
+// The openshift profile
+:leveloffset: +1
+
+[[build-the-quickstart-for-openshift]]
+== Build the {productName} Source-to-Image (S2I) Quickstart to OpenShift with Helm Charts
+
+On OpenShift, the S2I build with Apache Maven will use an `openshift` profile used to provision a {productName} server to deploy and run the quickstart in OpenShift environment.
+You can activate the Maven profile named `openshift` when building the quickstart:
+
+[source,subs="attributes+",options="nowrap"]
+----
+$ mvn clean package -Popenshift
+----
+
+The provisioned {productName} server for OpenShift, with the quickstart deployed, can then be found in the `target/server` directory, and its usage is similar to a standard server distribution.
+ifndef::ProductRelease,EAPXPRelease[]
+You may note that unlike the `provisioned-server` profile it uses the cloud feature pack which enables a configuration tuned for OpenShift environment.
+endif::[]
+ifdef::ProductRelease,EAPXPRelease[]
+You may note that it uses the cloud feature pack which enables a configuration tuned for OpenShift environment.
+endif::[]
 
 ifndef::ProductRelease,EAPXPRelease[]
-= {productName} Quickstarts
+The server provisioning functionality is provided by the WildFly Maven Plugin, and you may find its configuration in the quickstart `pom.xml`:
+endif::[]
 
-[toc]
+ifdef::ProductRelease,EAPXPRelease[]
+The server provisioning functionality is provided by the EAP Maven Plugin, and you may find its configuration in the quickstart `pom.xml`:
+endif::[]
 
-[abstract]
-The quickstarts demonstrate {javaVersion} and a few additional technologies from the {productNameFull} stack. They provide small, specific, working examples that can be used as a reference for your own project.
+ifndef::ProductRelease,EAPXPRelease[]
+[source,xml,subs="attributes+"]
+----
+        <profile>
+            <id>openshift</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jboss.eap.plugins</groupId>
+                        <artifactId>eap-maven-plugin</artifactId>
+                        <version>${version.eap.maven.plugin}</version>
+                        <configuration>
+                            <feature-packs>
+                                <feature-pack>
+                                    <location>org.wildfly:wildfly-galleon-pack:${version.server}</location>
+                                </feature-pack>
+                                <feature-pack>
+                                    <location>org.wildfly.cloud:wildfly-cloud-galleon-pack:${version.cloud.fp}</location>
+                                </feature-pack>
+                            </feature-packs>
+                            <layers>
+                                <layer>cloud-server</layer>
+                            </layers>
+                            <filename>ROOT.war</filename>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+----
+endif::[]
 
-[[introduction]]
-== Introduction
+ifdef::ProductRelease,EAPXPRelease[]
+[source,xml,subs="attributes+"]
+----
+        <profile>
+            <id>openshift</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jboss.eap.plugins</groupId>
+                        <artifactId>eap-maven-plugin</artifactId>
+                        <version>${version.eap.maven.plugin}</version>
+                        <configuration>
+                            <feature-packs>
+                                <feature-pack>
+                                    <location>org.jboss.eap:wildfly-ee-galleon-pack</location>
+                                </feature-pack>
+                                <feature-pack>
+                                    <location>org.jboss.eap.cloud:eap-cloud-galleon-pack</location>
+                                </feature-pack>
+                            </feature-packs>
+                            <layers>
+                                <layer>cloud-server</layer>
+                            </layers>
+                            <filename>ROOT.war</filename>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+----
+endif::[]
 
-These quickstarts run on the WildFly application server. The quickstarts are configured to use the correct Maven dependencies and ensure that you test and compile the quickstarts against the correct runtime environment.
+[NOTE]
+====
+Since the plugin configuration above deploys quickstart on root web context of the provisioned server, the URL to access the application should not have the `/{artifactId}` path segment after `HOST:PORT`.
+====
 
-Each quickstart folder contains a `README.adoc` file that describes the quickstart features and provides instructions about how to build and run it. Instructions are provided to build the more readable `README.html` files.
+:leveloffset: 1
+// Getting Started with Helm
+:leveloffset: +1
 
-Make sure you read this entire document before you attempt to work with the quickstarts.
+[[getting_started_with_helm]]
+= Getting Started with {xpaasproduct-shortname} and Helm Charts
 
-[[system_requirements]]
-== System Requirements
+This section contains the basic instructions to build and deploy this quickstart to {xpaasproduct-shortname} or {xpaasproductOpenShiftOnline-shortname} using Helm Charts.
 
-The applications these projects produce are designed to be run on {productNameFull} {productVersion} or later.
-
-All you need to build these projects is {buildRequirements}.
-
-[[use_of_product_home_and_jboss_home_variables]]
-== Use of WILDFLY_HOME and QUICKSTART_HOME Variables
-
-The quickstart `README` files use the _replaceable_ value `__WILDFLY_HOME__` to denote the path to the WildFly server. When you encounter this value in a `README` file, make sure you replace it with the actual path to your WildFly server.
-
-When you see the replaceable variable __QUICKSTART_HOME__, replace it with the path to the root directory of all of the quickstarts.
-
-[[prerequisites]]
+[[prerequisites_helm_openshift]]
 == Prerequisites
 
-Before you begin, you must perform the following tasks.
+* You must be logged in OpenShift and have an `oc` client to connect to OpenShift
+* https://helm.sh[Helm] must be installed to deploy the backend on OpenShift.
 
-. xref:build_wildfly_server[Build the WildFly Server (Optional)]: This step is only required if you plan to run the latest https://github.com/wildfly/wildfly[development version of the WildFly server]. It is not required if you are running a https://github.com/wildfly/wildfly/tags[tagged] or https://github.com/wildfly/wildfly/releases[released] version of the WildFly server.
+Once you have installed Helm, you need to add the repository that provides Helm Charts for {productName}.
 
-. xref:build_wildfly_boms[Build and Install the WildFly BOMs (Optional)]: This step is only required if you are building a development version of the WildFly server and see dependency issues when you build the quickstarts. It is not required if you are running a https://github.com/wildfly/quickstart/tags[tagged] or  https://github.com/wildfly/boms/releases[released] version of the WildFly server.
-
-. xref:build_quickstart_readme_files[Build the Quickstart README.html Files (Required)]: The quickstart `README` files are written in AsciiDoc to provide modular, reusable content; however, this makes them difficult to read. For this reason, you must also build the quickstart `README.html` files from the AsciiDoc source.
-
-[[build_wildfly_server]]
-=== Build the WildFly Server (Optional)
-
-If you have downloaded a https://github.com/wildfly/wildfly/tags[tagged] or https://github.com/wildfly/wildfly/releases[released] version of the WildFly server, you can ignore this step. You can simply extract the WildFly server from the compressed file and https://github.com/jboss-developer/jboss-developer-shared-resources/blob/master/guides/START_JBOSS_EAP.adoc#start-the-red-hat-jboss-enterprise-application-platform-server[start the server] from that directory.
-
-If you plan to run the https://github.com/wildfly/wildfly[development version of the WildFly server], you must first download and build the WildFly server from source.
-
-. If you have not yet done so, you must clone https://github.com/wildfly/wildfly[WildFly server] repository and navigate to it. You might also want to change the remote name from `origin` to `upstream` to be consistent with your other repositories.
-+
+ifndef::ProductRelease,EAPXPRelease[]
 [source,options="nowrap"]
 ----
-$ git clone git@github.com:wildfly/wildfly.git
-$ cd wildfly
-$ git remote rename origin upstream
+$ helm repo add wildfly https://docs.wildfly.org/wildfly-charts/
+"wildfly" has been added to your repositories
+$ helm search repo wildfly
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION
+wildfly/wildfly         ...             ...            Build and Deploy WildFly applications on OpenShift
+wildfly/wildfly-common  ...             ...            A library chart for WildFly-based applications
 ----
-. Verify that your local `master` branch contains the latest updates.
-+
-[source,options="nowrap"]
+endif::[]
+ifdef::ProductRelease[]
+[source,options="nowrap",subs="+attributes"]
 ----
-$ git fetch upstream
-$ git checkout master
-$ git reset --hard upstream/master
+$ helm repo add jboss-eap https://jbossas.github.io/eap-charts/
+"jboss-eap" has been added to your repositories
+$ helm search repo jboss-eap
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION
+{helmChartName}         ...             ...             A Helm chart to build and deploy EAP {productVersion} applications
 ----
+endif::[]
+ifdef::EAPXPRelease[]
+[source,options="nowrap",subs="+attributes"]
+----
+$ helm repo add jboss-eap https://jbossas.github.io/eap-charts/
+"jboss-eap" has been added to your repositories
+$ helm search repo jboss-eap
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION
+{helmChartName}         ...             ...             A Helm chart to build and deploy EAP XP {productVersion} applications
+----
+endif::[]
 
-. Build the WildFly server using the following command.
-+
-[source,options="nowrap"]
-----
-$ mvn clean install -DskipTests -Denforcer.skip=true -Dcheckstyle.skip=true
-----
+:leveloffset: 1
+//Prepare Helm for Quickstart Deployment
+:leveloffset: +1
 
-. The WildFly server folder and ZIP files, which are named `wildfly-__VERSION__-SNAPSHOT` and `wildfly-__VERSION__-SNAPSHOT.ZIP` respectively,  are located in the `build/target/` directory. You can copy that folder or unzip the file to another location or https://github.com/jboss-developer/jboss-developer-shared-resources/blob/master/guides/START_JBOSS_EAP.adoc#start-the-red-hat-jboss-enterprise-application-platform-server[start the server] from that directory.
+[[deploy_helm]]
+== Deploy the {ProductShortName} Source-to-Image (S2I) Quickstart to OpenShift with Helm Charts
 
+Log in to your OpenShift instance using the `oc login` command.
+The backend will be built and deployed on OpenShift with a Helm Chart for {productName}.
 
-[[build_wildfly_boms]]
-=== Build and Install the WildFly BOMs (Optional)
-
-If you have downloaded and are running a https://github.com/wildfly/quickstart/tags[tagged] or https://github.com/wildfly/quickstart/releases[released] version of the quickstarts, you can ignore this step because the required BOMs are already installed in Maven.
-
-If you are using the latest https://github.com/wildfly/quickstart[development version] of the quickstarts and you are able to successfully build and deploy the quickstarts, you can also ignore this step because the required BOMS are already installed in Maven.
-
-However, if you  are using the latest https://github.com/wildfly/quickstart[development version] of the quickstarts and you see build errors indicating missing dependencies, you must first xref:build_wildfly_server[build the latest WildFly server] and then build and install the WildFly BOMs. This installs the latest Maven artifacts that are required by the SNAPSHOT version of the WildFly quickstarts that are still under development.
-
-. If you have not yet done so, clone https://github.com/wildfly/boms[WildFly BOMs] repository and navigate to it. You might also want to rename the directory to `wildfly-boms` to make it clear which BOMs it contains and also change the remote name from `origin` to `upstream` to be consistent with your other repositories.
-+
-[source,options="nowrap"]
+Navigate to the root directory of this quickstart and run the following command:
+[source,options="nowrap",subs="+attributes"]
 ----
-$ git clone git@github.com:wildfly/boms.git
-$ mv boms wildfly-boms
-$ cd wildfly-boms
-$ git remote rename origin upstream
-----
-. Verify that your local `master` branch contains the latest updates.
-+
-[source,options="nowrap"]
-----
-$ git fetch upstream
-$ git checkout master
-$ git reset --hard upstream/master
-----
-
-. Build the WildFly BOMs using the following command.
-+
-[source,options="nowrap"]
-----
-$ mvn clean install
-----
-+
-NOTE: If you run into build errors, check with the WildFly team to see if the repositories are temporarily out of sync.
-
-. At this point, you can verify that all of the quickstarts build using the following command.
-+
-[source,options="nowrap"]
-----
-$ mvn clean install '-Pdefault,!complex-dependencies'
+$ helm install {artifactId} -f charts/helm.yaml {helmChartName}
+NAME: {artifactId}
+...
+STATUS: deployed
+REVISION: 1
 ----
 
-[[build_quickstart_readme_files]]
-=== Build the Quickstart README.html Files (Required)
+The Helm Chart for this quickstart contains all the information to build an image from the source code using S2I on Java 17:
 
-The quickstart `README` files are written in AsciiDoc, not only because the language is much more powerful than Markdown, but also also because it is possible to extract common instructions into separate files to be reused across the quickstarts. While this makes them more flexible and easier to maintain, unfortunately, included files do not render in a readable format in GitHub or in most text editors.
-
-The Maven plugin that is used to build and deploy the quickstarts can also generate fully rendered `README.html` instructions from the `README.adoc` files.
-
-To build all of the quickstart `README.html` files, including the root `README.html` file that contains the table with links to all available quickstarts, navigate to the root folder of the quickstarts and run the following command.
-
-[source,options="nowrap"]
+[source,options="nowrap",subs="+attributes"]
 ----
-$ mvn clean package -Pdocs
+build:
+  uri: {githubRepoCodeUrl}
+  ref: {WildFlyQuickStartRepoTag}
+  contextDir: {artifactId}
+deploy:
+  replicas: 1
 ----
 
-[TIP]
+This will create a new deployment on OpenShift and deploy the application.
+
+If you want to see all the configuration elements to customize your deployment you can use the following command:
+[source,options="nowrap",subs="+attributes"]
+----
+$ helm show readme {helmChartName}
+----
+
+Let’s wait for the application to be built and deployed:
+[source,options="nowrap",subs="+attributes"]
+----
+$ oc get deployment {artifactId} -w
+NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+{artifactId}   1         1         1            0           12s
+...
+{artifactId}   1         1         1            1           2m
+----
+
+Get the URL of the route to the deployment.
+
+[source,options="nowrap",subs="+attributes"]
+----
+$ oc get route {artifactId} -o jsonpath="{.spec.host}"
+----
+Access the application in your web browser using the displayed URL.
+
+[NOTE]
 ====
-To build the `README.html` file for a specific quickstart, navigate to the quickstart directory and run the above command.
+The Maven profile named `openshift` is used by the Helm chart to provision the server with the quickstart deployed on the root web context, and thus the application should be accessed with the URL without the `/{artifactId}` path segment after `HOST:PORT`.
 ====
 
-If you see errors about missing dependencies, check the xref:prerequisites[prerequisites] section to determine whether you need to xref:build_wildfly_boms[build the WildFly BOMs] that corresponds to the version of the quickstarts that you are using.
+[[undeploy_helm]]
+== Undeploy the {ProductShortName} Source-to-Image (S2I) Quickstart from OpenShift with Helm Charts
 
-[[suggested_approach_to_the_quickstarts]]
-== Suggested Approach to the Quickstarts
 
-We recommend that you approach the quickstarts as follows:
+[source,options="nowrap",subs="+attributes"]
+----
+$ helm uninstall {artifactId}
+----
 
-* Regardless of your level of expertise, we suggest you start with the `helloworld` quickstart. It is the simplest example and is an easy way to prove the server is configured and running correctly.
-* If you are a beginner or new to JBoss, start with the quickstarts labeled `Beginner`, then try those marked as `Intermediate`. When you are comfortable with those, move on to the `Advanced` quickstarts.
-* Some quickstarts are based upon other quickstarts but have expanded capabilities and functionality. If a prerequisite quickstart is listed, make sure you deploy and test it before looking at the expanded version.
+:leveloffset: 1
+// Testing on Openshift
+:leveloffset: +1
 
-The root folder of each individual quickstart contains a `README.html` file with detailed instructions on how to build and run the example.
+[[run_the_arquillian_integration_tests_with_openshift]]
+= Run the Arquillian Integration Tests with OpenShift
+//******************************************************************************
+// Include this template if your quickstart provides Openshift Arquillian
+// integration tests.
+//******************************************************************************
 
-// END ifndef::ProductRelease,EAPCDRelease,EAPXPRelease[]
-endif::[]
+This quickstart includes Arquillian integration tests. They are located under the  `src/test/` directory. The integration tests verify that the quickstart runs correctly when deployed on the server.
 
-//**********************************************************************************
-//
-// WildFly Developers: You can ignore the rest of this file.
-// It is for the JBoss EAP product, CD and XP Releases.
-//
-//**********************************************************************************
+[NOTE]
+====
+The Arquillian integration tests expect a deployed application, so make sure you have deployed the quickstart on OpenShift before you begin.
+====
 
-ifdef::ProductRelease,EAPXPRelease[]
-// These instructions are only for the JBoss EAP product, CD and XP Releases.
-= {productNameFull} ({productName}) Quickstarts
+Run the integration tests using the following command to run the `verify` goal with the `arq-remote` profile activated and the proper URL:
+[source,options="nowrap",subs="+attributes"]
+----
+$ mvn clean verify -Parq-remote -Dserver.host=https://$(oc get route {artifactId} --template='{{ .spec.host }}')
+----
 
-[abstract]
-The quickstarts demonstrate {javaVersion} and a few additional technologies from the {productNameFull} stack. They provide small, specific, working examples that can be used as a reference for your own project.
+[NOTE]
+====
+The tests are using SSL to connect to the quickstart running on OpenShift. So you need the certificates to be trusted by the machine the tests are run from.
+====
 
-[[introduction]]
-== Introduction
+:leveloffset: 1
 
-These quickstarts run on {productNameFull} {productVersion}.
-
-We recommend that you use the *{quickstartDownloadName}* ZIP file, which you can download from the {quickstartDownloadUrl}[{productName} Software Download] page on the Red Hat Customer Portal. This version of the quickstarts uses the correct dependencies and ensures that you test and compile against the correct server runtime environment.
-
-Each quickstart folder contains a `README{outfilesuffix}` file that describes the quickstart features and provides instructions about how to build and run it.
-
-Make sure you read this entire document before you attempt to work with the quickstarts.
-
-ifdef::ProductRelease,EAPXPRelease[]
-// System Requirements are not needed for the CD Releases, only for the Product and XP Release.
-[[system_requirements]]
-== System Requirements
-
-The applications these projects produce are designed to be run on {productNameFull} {productVersion} or later.
-
-All you need to build these projects is {buildRequirements}.
-
-[[use_of_product_home_and_jboss_home_variables]]
-== Use of {jbossHomeName} and QUICKSTART_HOME Variables
-
-The quickstart `README` files use the _replaceable_ value `__{jbossHomeName}__`  to denote the path to the {productName} installation. When you encounter this value in a `README` file, make sure you replace it with the actual path to your {productName} installation. The installation path is described in detail here: link:{useProductHomeDocUrl}[Use of __{jbossHomeName}__ and __JBOSS_HOME__ Variables]
-
-When you see the replaceable variable __QUICKSTART_HOME__, replace it with the path to the root directory of all of the quickstarts.
-// END ifdef::ProductRelease,EAPXPRelease[]
-endif::[]
-
-[[suggested_approach_to_the_quickstarts]]
-== Suggested Approach to the Quickstarts
-
-We suggest you approach the quickstarts as follows:
-
-* Regardless of your level of expertise, we suggest you start with the `helloworld` quickstart. It is the simplest example and is an easy way to prove the server is configured and running correctly.
-* If you are a beginner or new to JBoss, start with the quickstarts labeled `Beginner`, then try those marked as `Intermediate`. When you are comfortable with those, move on to the `Advanced` quickstarts.
-* Some quickstarts are based upon other quickstarts but have expanded capabilities and functionality. If a prerequisite quickstart is listed, make sure you deploy and test it before looking at the expanded version.
-
-// END ifdef::ProductRelease,EAPXPRelease[]
-endif::[]
-
-// The following is included for all versions: WildFly, JBoss EAP, EAP CD and EAP XP
-[[available_quickstarts]]
-== Table of Available Quickstarts
-
-The sources for all available quickstarts, which are listed in the following table, can be found here: {githubRepoUrl}.
-
-Each quickstart provides the list of technologies demonstrated by the quickstart and the required experience level needed to build and deploy it. Click on the quickstart link in the table to see more detailed information about how to run it. Some quickstarts require deployment of other quickstarts. This information is noted in the `Prerequisites` section of the quickstart `README.html` file.
-
-NOTE: Some of these quickstarts use the H2 database included with {productNameFull} {productVersion}. It is a lightweight, relational example datasource that is used for examples only. It is not robust or scalable, is not supported, and should NOT be used in a production environment!
-
-//<TOC>
-[cols="1,1,2,1,1", options="header"]
-|===
-| Quickstart Name | Demonstrated Technologies | Description | Experience Level Required | Prerequisites
-| link:cmt/README{outfilesuffix}[cmt]|EJB, CMT, JMS | The `cmt` quickstart demonstrates Container-Managed Transactions (CMT), showing how to use transactions managed by the container. | Intermediate | _none_
-| link:ee-security/README{outfilesuffix}[ee-security]|EE Security, Servlet, CDI | The `ee-security` quickstart demonstrates Jakarta EE security. | Intermediate | _none_
-| link:helloworld/README{outfilesuffix}[helloworld]|Servlet | The `helloworld` quickstart demonstrates the use of Servlet 6 and is a good starting point to verify {productName} is configured correctly. | Beginner | _none_
-| link:helloworld-ws/README{outfilesuffix}[helloworld-ws]|JAX-WS | The `helloworld-ws` quickstart demonstrates a simple Hello World application, bundled and deployed as a WAR, that uses JAX-WS to say Hello. | Beginner | _none_
-| link:jaxrs-client/README{outfilesuffix}[jaxrs-client]|JAX-RS | The `jaxrs-client` quickstart demonstrates JAX-RS Client API, which interacts with a JAX-RS Web service that runs on {productName}. | Beginner | _none_
-| link:kitchensink/README{outfilesuffix}[kitchensink]|CDI, JSF, JPA, EJB, JAX-RS, BV | The `kitchensink` quickstart demonstrates a {javaVersion} web-enabled database application using JSF, CDI, EJB, JPA, and Bean Validation. | Intermediate | _none_
-| link:numberguess/README{outfilesuffix}[numberguess]|CDI, JSF | The `numberguess` quickstart demonstrates the use of CDI  (Contexts and Dependency Injection) and JSF (JavaServer Faces) in {productName}. | Beginner | _none_
-| link:remote-helloworld-mdb/README{outfilesuffix}[remote-helloworld-mdb]|JMS, EJB, MDB | The `remote-helloworld-mdb` quickstart demonstrates the use of JMS and EJB Message-Driven Bean in {productName} with a remote broker. | Intermediate | _none_
-| link:servlet-security/README{outfilesuffix}[servlet-security]|Servlet, Security | The `servlet-security` quickstart demonstrates the use of Jakarta EE declarative security to control access to Servlets and Security in {productName}. | Intermediate | _none_
-| link:temperature-converter/README{outfilesuffix}[temperature-converter]|CDI, JSF, SLSB EJB | The `temperature-converter` quickstart does temperature conversion using an EJB Stateless Session Bean (SLSB), CDI, and a JSF front-end client. | Beginner | _none_
-| link:thread-racing/README{outfilesuffix}[thread-racing]|Batch, CDI, EE Concurrency, JAX-RS, JMS, JPA, JSON, Web Sockets | A thread racing web application that demonstrates technologies introduced or updated in the latest Jakarta EE specification. | Beginner | _none_
-| link:todo-backend/README{outfilesuffix}[todo-backend]|JPA, JAX-RS, OpenShift, Galleon | The `todo-backend` quickstart demonstrates how to implement a backend that exposes a HTTP API with JAX-RS | Intermediate | _none_
-| link:websocket-hello/README{outfilesuffix}[websocket-hello]|WebSocket, CDI, JSF | The `websocket-hello` quickstart demonstrates how to create a simple WebSocket application. | Beginner | _none_
-|===
-//</TOC>
+:leveloffset!:
