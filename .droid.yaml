@@ -1,0 +1,20 @@
+review:
+  guidelines:
+  - path: '**'
+    guideline: Don't leave commented out code. Delete it.
+  - path: '**'
+    guideline: Catch and correct any obvious bugs.
+  - path: '**'
+    guideline: Correct grammar mistakes. Only comment on incorrect grammar - not style.
+      However, allow for flexible capitalization and abbreviation for variable names.
+  - path: '**'
+    guideline: Ensure that no sensitive information such as keys, passwords, or tokens
+      are hardcoded in the codebase. Use environment variables or secure vaults for
+      managing secrets.
+  - path: '**'
+    guideline: Avoid the use of global variables unless absolutely necessary. Prefer
+      local variables or encapsulation within classes to prevent unintended side-effects.
+  - path: '**'
+    guideline: Avoid hard-coding values directly in the code; use named constants
+      instead, and ensure that the code is modular and adheres to the DRY principle
+      to avoid redundancy.
