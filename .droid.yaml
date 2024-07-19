@@ -1,0 +1,4 @@
+# .droid.yaml configuration
+review:
+  auto: true
+enable_skip_reason_comments: false
