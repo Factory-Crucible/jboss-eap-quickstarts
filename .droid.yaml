@@ -1,0 +1,7 @@
+# CI/CD Pipeline Configuration
+
+# Pull Request Review Settings
+reviews:
+  enable_skip_reason_comments: false
+
+# Additional CI/CD configurations can be added here in the future
