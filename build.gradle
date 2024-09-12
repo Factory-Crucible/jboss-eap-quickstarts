@@ -1,0 +1,50 @@
+plugins {
+    id 'org.springframework.boot' version '3.1.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'java'
+}
+
+group = 'org.jboss.as.quickstarts'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // Database
+    runtimeOnly 'com.h2database:h2'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // Additional dependencies (adjust versions as needed)
+    implementation 'org.hibernate:hibernate-core:6.2.0.Final'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
+    implementation 'org.jboss.logging:jboss-logging:3.5.0.Final'
+
+    // RESTful API
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+bootJar {
+    archiveBaseName = 'kitchensink'
+    archiveVersion = '1.0.0-SNAPSHOT'
+}
+
+springBoot {
+    mainClass = 'org.jboss.as.quickstarts.kitchensink.KitchensinkApplication'
+}
