@@ -1,0 +1,11 @@
+{
+  "name": "kitchensink",
+  "version": "8.0.0.GA",
+  "description": "A Jakarta EE web application demonstrating Java EE technologies",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
+}
