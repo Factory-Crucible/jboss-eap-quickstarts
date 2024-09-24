@@ -21,10 +21,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import org.jboss.as.quickstarts.kitchensink.model.Member;
+import org.springframework.data.jpa.repository.Query;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+    @Query("SELECT m FROM Member m WHERE m.email = :email")
     Member findByEmail(String email);
 
     List<Member> findAllByOrderByNameAsc();
