@@ -1,6 +1,7 @@
 package com.example.springboot.model;
 
 import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -12,6 +13,8 @@ import lombok.Data;
  * Future enhancements may include relationships such as @OneToMany or @ManyToOne as needed.
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "member")
 public class Member {
@@ -26,7 +29,6 @@ public class Member {
     private String name;
 
     @NotNull
-    @NotEmpty
     @Email(message = "Invalid email format")
     @Column(unique = true)
     private String email;

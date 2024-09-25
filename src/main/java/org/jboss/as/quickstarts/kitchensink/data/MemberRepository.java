@@ -14,19 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.as.quickstarts.kitchensink.data;
+package org.springframework.boot.kitchensink.data;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
-
-import org.jboss.as.quickstarts.kitchensink.model.Member;
+import org.springframework.boot.kitchensink.model.Member;
 import org.springframework.data.jpa.repository.Query;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    @Query("SELECT m FROM Member m WHERE m.email = :email")
     Member findByEmail(String email);
 
     List<Member> findAllByOrderByNameAsc();

@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.as.quickstarts.kitchensink.service;
+package com.example.kitchensink.service;
 
-import org.jboss.as.quickstarts.kitchensink.model.Member;
-import org.jboss.as.quickstarts.kitchensink.repository.MemberRepository;
+import com.example.kitchensink.model.Member;
+import com.example.kitchensink.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -29,18 +29,21 @@ import java.util.logging.Logger;
 @Transactional
 public class MemberRegistration {
 
-    @Autowired
-    private Logger log;
+    private final Logger log;
+    private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private MemberRepository memberRepository;
+    public MemberRegistration(Logger log, MemberRepository memberRepository, ApplicationEventPublisher eventPublisher) {
+        this.log = log;
+        this.memberRepository = memberRepository;
+        this.eventPublisher = eventPublisher;
+    }
 
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
-
-    public void register(Member member) {
-        log.info("Registering " + member.getName());
-        memberRepository.save(member);
-        eventPublisher.publishEvent(member);
+    public Member register(Member member) {
+        log.info("Registering {}", member.getName());
+        Member savedMember = memberRepository.save(member);
+        eventPublisher.publishEvent(new MemberRegisteredEvent(savedMember));
+        return savedMember;
     }
 }
