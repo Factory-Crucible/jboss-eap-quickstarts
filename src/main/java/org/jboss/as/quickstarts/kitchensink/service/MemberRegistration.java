@@ -14,32 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.as.quickstarts.kitchensink.service;
+package com.example.kitchensink.service;
 
-import org.jboss.as.quickstarts.kitchensink.model.Member;
+import com.example.kitchensink.model.Member;
+import com.example.kitchensink.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ejb.Stateless;
-import jakarta.enterprise.event.Event;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
 import java.util.logging.Logger;
 
-// The @Stateless annotation eliminates the need for manual transaction demarcation
-@Stateless
+@Service
+@Transactional
 public class MemberRegistration {
 
-    @Inject
-    private Logger log;
+    private final Logger log;
+    private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @Inject
-    private EntityManager em;
+    @Autowired
+    public MemberRegistration(Logger log, MemberRepository memberRepository, ApplicationEventPublisher eventPublisher) {
+        this.log = log;
+        this.memberRepository = memberRepository;
+        this.eventPublisher = eventPublisher;
+    }
 
-    @Inject
-    private Event<Member> memberEventSrc;
-
-    public void register(Member member) throws Exception {
-        log.info("Registering " + member.getName());
-        em.persist(member);
-        memberEventSrc.fire(member);
+    public Member register(Member member) {
+        log.info("Registering {}", member.getName());
+        Member savedMember = memberRepository.save(member);
+        eventPublisher.publishEvent(new MemberRegisteredEvent(savedMember));
+        return savedMember;
     }
 }
