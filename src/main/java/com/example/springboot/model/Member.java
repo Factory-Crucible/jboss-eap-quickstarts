@@ -1,9 +1,12 @@
 package com.example.springboot.model;
 
 import jakarta.persistence.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Represents a Member entity in the Spring Boot application.
@@ -26,10 +29,11 @@ public class Member {
     @NotNull
     @Size(min = 1, max = 25)
     @Pattern(regexp = "[^0-9]*", message = "Must not contain numbers")
+    @Column(name = "name")
     private String name;
 
     @NotNull
-    @Email(message = "Invalid email format")
+    @Email
     @Column(unique = true)
     private String email;
 
