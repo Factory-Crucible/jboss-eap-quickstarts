@@ -1,0 +1,40 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'org.jboss.as.quickstarts.kitchensink'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // Jakarta EE APIs (replacing JBoss-specific dependencies)
+    implementation 'jakarta.platform:jakarta.jakartaee-api:9.1.0'
+
+    // Hibernate
+    implementation 'org.hibernate:hibernate-core:5.6.9.Final'
+
+    // H2 Database (for development and testing)
+    runtimeOnly 'com.h2database:h2'
+
+    // Test dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+bootJar {
+    mainClassName = 'org.jboss.as.quickstarts.kitchensink.KitchensinkApplication'
+}
