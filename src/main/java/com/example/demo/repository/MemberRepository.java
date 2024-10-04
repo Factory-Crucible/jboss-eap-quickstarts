@@ -14,32 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.as.quickstarts.kitchensink.service;
+package com.example.demo.repository;
 
-import org.jboss.as.quickstarts.kitchensink.model.Member;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import com.example.demo.model.Member;
 
-import jakarta.ejb.Stateless;
-import jakarta.enterprise.event.Event;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import java.util.logging.Logger;
+import java.util.List;
 
-// The @Stateless annotation eliminates the need for manual transaction demarcation
-@Stateless
-public class MemberRegistration {
+@Repository
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    @Inject
-    private Logger log;
+    /**
+     * Find a member by email
+     * @param email the email to search for
+     * @return the member with the given email
+     */
+    Member findByEmail(String email);
 
-    @Inject
-    private EntityManager em;
-
-    @Inject
-    private Event<Member> memberEventSrc;
-
-    public void register(Member member) throws Exception {
-        log.info("Registering " + member.getName());
-        em.persist(member);
-        memberEventSrc.fire(member);
-    }
+    /**
+     * Find all members ordered by name
+     * @return a list of all members ordered by name
+     */
+    @Query("SELECT m FROM Member m ORDER BY m.name ASC")
+    List<Member> findAllOrderedByName();
 }
