@@ -16,49 +16,39 @@
  */
 package org.jboss.as.quickstarts.kitchensink.controller;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.inject.Model;
-import jakarta.enterprise.inject.Produces;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.ModelAndView;
 
-// The @Model stereotype is a convenience mechanism to make this a request-scoped bean that has an
-// EL name
+// The @Controller annotation is used to mark this class as a Spring MVC controller
 // Read more about the @Model stereotype in this FAQ:
 // http://www.cdi-spec.org/faq/#accordion6
-@Model
+@Controller
 public class MemberController {
 
-    @Inject
-    private FacesContext facesContext;
-
-    @Inject
+    @Autowired
     private MemberRegistration memberRegistration;
 
-    @Produces
-    @Named
     private Member newMember;
 
-    @PostConstruct
-    public void initNewMember() {
+    @GetMapping("/")
+    public ModelAndView initNewMember() {
         newMember = new Member();
+        return new ModelAndView("home", "newMember", newMember);
     }
 
-    public void register() throws Exception {
+    @PostMapping("/register")
+    public ModelAndView register() {
         try {
             memberRegistration.register(newMember);
-            FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_INFO, "Registered!", "Registration successful");
-            facesContext.addMessage(null, m);
-            initNewMember();
+            return new ModelAndView("success", "message", "Registration successful");
         } catch (Exception e) {
             String errorMessage = getRootErrorMessage(e);
-            FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_ERROR, errorMessage, "Registration unsuccessful");
-            facesContext.addMessage(null, m);
+            return new ModelAndView("error", "message", errorMessage);
         }
     }
 
@@ -66,18 +56,11 @@ public class MemberController {
         // Default to general error message that registration failed.
         String errorMessage = "Registration failed. See server log for more information";
         if (e == null) {
-            // This shouldn't happen, but return the default messages
             return errorMessage;
         }
 
-        // Start with the exception and recurse to find the root cause
-        Throwable t = e;
-        while (t != null) {
-            // Get the message from the Throwable class instance
-            errorMessage = t.getLocalizedMessage();
-            t = t.getCause();
-        }
-        // This is the root cause message
+        Throwable rootCause = org.springframework.core.NestedExceptionUtils.getRootCause(e);
+        errorMessage = rootCause != null ? rootCause.getLocalizedMessage() : e.getLocalizedMessage();
         return errorMessage;
     }
 
