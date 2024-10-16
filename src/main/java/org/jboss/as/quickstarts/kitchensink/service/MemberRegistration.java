@@ -18,28 +18,29 @@ package org.jboss.as.quickstarts.kitchensink.service;
 
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 
-import jakarta.ejb.Stateless;
-import jakarta.enterprise.event.Event;
-import jakarta.inject.Inject;
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import jakarta.persistence.EntityManager;
 import java.util.logging.Logger;
 
-// The @Stateless annotation eliminates the need for manual transaction demarcation
-@Stateless
+@Service
 public class MemberRegistration {
 
-    @Inject
-    private Logger log;
+    private final Logger log;
+    private final EntityManager em;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @Inject
-    private EntityManager em;
-
-    @Inject
-    private Event<Member> memberEventSrc;
+    @Autowired
+    public MemberRegistration(Logger log, EntityManager em, ApplicationEventPublisher eventPublisher) {
+        this.log = log;
+        this.em = em;
+        this.eventPublisher = eventPublisher;
+    }
 
     public void register(Member member) throws Exception {
         log.info("Registering " + member.getName());
         em.persist(member);
-        memberEventSrc.fire(member);
+        eventPublisher.publishEvent(member);
     }
 }

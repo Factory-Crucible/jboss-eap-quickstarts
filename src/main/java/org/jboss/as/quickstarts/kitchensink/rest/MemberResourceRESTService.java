@@ -49,32 +49,31 @@ import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
  * <p/>
  * This class produces a RESTful service to read/write the contents of the members table.
  */
-@Path("/members")
+@RestController
+@RequestMapping("/members")
 @RequestScoped
 public class MemberResourceRESTService {
 
-    @Inject
-    private Logger log;
+    private final Logger log;
+    private final Validator validator;
+    private final MemberRepository repository;
+    private final MemberRegistration registration;
 
-    @Inject
-    private Validator validator;
+    @Autowired
+    public MemberResourceRESTService(Logger log, Validator validator, MemberRepository repository, MemberRegistration registration) {
+        this.log = log;
+        this.validator = validator;
+        this.repository = repository;
+        this.registration = registration;
+    }
 
-    @Inject
-    private MemberRepository repository;
-
-    @Inject
-    MemberRegistration registration;
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @GetMapping
     public List<Member> listAllMembers() {
         return repository.findAllOrderedByName();
     }
 
-    @GET
-    @Path("/{id:[0-9][0-9]*}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Member lookupMemberById(@PathParam("id") long id) {
+    @GetMapping("/{id}")
+    public Member lookupMemberById(@PathVariable("id") long id) {
         Member member = repository.findById(id);
         if (member == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
