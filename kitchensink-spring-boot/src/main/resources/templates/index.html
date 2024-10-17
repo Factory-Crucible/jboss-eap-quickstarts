@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kitchensink Spring Boot: Member Registration</title>
+    <link rel="stylesheet" th:href="@{/resources/css/screen.css}" type="text/css"/>
+    <script th:src="@{/resources/js/jquery-3.6.0.min.js}"></script>
+</head>
+<body>
+    <div id="container">
+        <div id="content">
+            <h1>Welcome to Kitchensink Spring Boot</h1>
+
+            <div th:if="${successMessage}" class="success">
+                <p th:text="${successMessage}"></p>
+            </div>
+
+            <h2>Member Registration</h2>
+            <form id="reg" th:action="@{/register}" th:object="${newMember}" method="post">
+                <table>
+                    <tr>
+                        <th>
+                            <label for="name">Name:</label>
+                        </th>
+                        <td>
+                            <input id="name" type="text" th:field="*{name}" />
+                            <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="email">Email:</label>
+                        </th>
+                        <td>
+                            <input id="email" type="email" th:field="*{email}" />
+                            <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="phoneNumber">Phone #:</label>
+                        </th>
+                        <td>
+                            <input id="phoneNumber" type="tel" th:field="*{phoneNumber}" />
+                            <span class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    <input type="submit" value="Register" class="register"/>
+                    <input type="reset" value="Cancel" class="cancel"/>
+                </p>
+            </form>
+
+            <h2>Members</h2>
+            <table class="simpletablestyle">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone #</th>
+                        <th>REST URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="member : ${members}">
+                        <td th:text="${member.id}"></td>
+                        <td th:text="${member.name}"></td>
+                        <td th:text="${member.email}"></td>
+                        <td th:text="${member.phoneNumber}"></td>
+                        <td><a th:href="@{/rest/members/{id}(id=${member.id})}" th:text="@{/rest/members/{id}(id=${member.id})}"></a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="messageBox" class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+        </div>
+        <div id="aside">
+            <p>Learn more about Spring Boot:</p>
+            <ul>
+                <li><a href="https://spring.io/projects/spring-boot">Spring Boot Project</a></li>
+                <li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/">Spring Boot Documentation</a></li>
+            </ul>
+        </div>
+        <div id="footer">
+            <p>
+                This project was generated from a Maven archetype from
+                JBoss, migrated to Spring Boot.<br />
+            </p>
+        </div>
+    </div>
+</body>
+</html>
