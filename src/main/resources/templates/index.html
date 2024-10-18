@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchensink Spring Boot</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div id="container">
+        <h1>Kitchensink Spring Boot</h1>
+
+        <div id="content">
+            <h2>Member Registration</h2>
+
+            <form th:action="@{/register}" th:object="${newMember}" method="post">
+                <div th:if="${#fields.hasAnyErrors()}">
+                    <ul>
+                        <li th:each="err : ${#fields.allErrors()}" th:text="${err}">Input is incorrect</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <label for="name">Name:</label>
+                    <input id="name" type="text" th:field="*{name}" />
+                </div>
+
+                <div>
+                    <label for="email">Email:</label>
+                    <input id="email" type="email" th:field="*{email}" />
+                </div>
+
+                <div>
+                    <label for="phoneNumber">Phone #:</label>
+                    <input id="phoneNumber" type="tel" th:field="*{phoneNumber}" />
+                </div>
+
+                <input type="submit" value="Register" />
+            </form>
+
+            <h2>Members</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone #</th>
+                        <th>REST URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="member : ${members}">
+                        <td th:text="${member.id}">0</td>
+                        <td th:text="${member.name}">John Doe</td>
+                        <td th:text="${member.email}">john@example.com</td>
+                        <td th:text="${member.phoneNumber}">123-456-7890</td>
+                        <td><a th:href="@{/rest/members/{id}(id=${member.id})}" th:text="@{/rest/members/{id}(id=${member.id})}">REST URL</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="aside">
+            <p>Learn more about JBoss EAP and Spring Boot:</p>
+            <ul>
+                <li><a href="https://www.redhat.com/en/technologies/jboss-middleware/application-platform">JBoss EAP</a></li>
+                <li><a href="https://spring.io/projects/spring-boot">Spring Boot</a></li>
+            </ul>
+        </div>
+
+        <div id="footer">
+            <p>This project was migrated from JBoss EAP to Spring Boot.</p>
+        </div>
+    </div>
+
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>
