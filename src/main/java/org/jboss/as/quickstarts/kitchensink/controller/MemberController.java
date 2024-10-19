@@ -24,7 +24,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import org.jboss.as.quickstarts.kitchensink.model.Member;
+import org.jboss.as.quickstarts.kitchensink.model.v2.Member;
 import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
 
 // The @Model stereotype is a convenience mechanism to make this a request-scoped bean that has an
