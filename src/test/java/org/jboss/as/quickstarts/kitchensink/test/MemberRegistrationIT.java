@@ -67,3 +67,56 @@ public class MemberRegistrationIT {
     }
 
 }
+
+    @Test
+    public void testRetrieve() throws Exception {
+        Member newMember = new Member();
+        newMember.setName("John Doe");
+        newMember.setEmail("john@mailinator.com");
+        newMember.setPhoneNumber("2125551111");
+        memberRegistration.register(newMember);
+        
+        Member retrievedMember = memberRegistration.find(newMember.getId());
+        assertNotNull(retrievedMember);
+        assertEquals(newMember.getName(), retrievedMember.getName());
+        assertEquals(newMember.getEmail(), retrievedMember.getEmail());
+        assertEquals(newMember.getPhoneNumber(), retrievedMember.getPhoneNumber());
+        
+        log.info(retrievedMember.getName() + " was retrieved with id " + retrievedMember.getId());
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        Member newMember = new Member();
+        newMember.setName("Alice Smith");
+        newMember.setEmail("alice@mailinator.com");
+        newMember.setPhoneNumber("2125552222");
+        memberRegistration.register(newMember);
+        
+        assertNotNull(memberRegistration.find(newMember.getId()));
+        
+        memberRegistration.delete(newMember);
+        assertNull(memberRegistration.find(newMember.getId()));
+        
+        log.info(newMember.getName() + " was deleted with id " + newMember.getId());
+    }
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.UserTransaction;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+@PersistenceContext
+private EntityManager em;
+
+@Inject
+private UserTransaction utx;
+
+@After
+public void tearDown() throws Exception {
+    utx.begin();
+    em.createQuery("delete from Member").executeUpdate();
+    utx.commit();
+}
