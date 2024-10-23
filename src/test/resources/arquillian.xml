@@ -29,8 +29,10 @@
         <!-- By default, Arquillian will use the JBOSS_HOME environment variable to find the JBoss EAP installation.
              If you prefer not to define the JBOSS_HOME environment variable, alternatively you can uncomment the
              following `jbossHome` property and replace EAP_HOME with the path to your JBoss EAP installation. -->
-        <!--<configuration>
-            <property name="jbossHome">EAP_HOME</property>
-        </configuration> -->
+        <configuration>
+            <property name="jbossHome">${env.JBOSS_HOME:target/wildfly-26.1.3.Final}</property>
+            <property name="serverConfig">standalone-full.xml</property>
+            <property name="javaVmArguments">-Djboss.socket.binding.port-offset=100</property>
+        </configuration>
     </container>
 </arquillian>
