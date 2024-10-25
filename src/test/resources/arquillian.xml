@@ -34,3 +34,40 @@
         </configuration> -->
     </container>
 </arquillian>
+    <!-- Docker container configuration -->
+    <container qualifier="wildfly-docker" default="true">
+        <configuration>
+            <property name="dockerImageName">jboss/wildfly:latest</property>
+            <property name="port">8080</property>
+        </configuration>
+    </container>
+
+    <!-- Database container configuration -->
+    <container qualifier="mysql-docker">
+        <configuration>
+            <property name="dockerImageName">mysql:latest</property>
+            <property name="port">3306</property>
+            <property name="environmentVariables">
+                MYSQL_ROOT_PASSWORD=rootpassword
+                MYSQL_DATABASE=testdb
+                MYSQL_USER=testuser
+                MYSQL_PASSWORD=testpassword
+            </property>
+        </configuration>
+    </container>
+
+    <!-- Arquillian Cube extension for Docker integration -->
+    <extension qualifier="docker">
+        <property name="dockerContainersFile">docker-compose.yml</property>
+        <property name="dockerMachineName">default</property>
+        <property name="dockerContainers">
+            wildfly:
+                image: jboss/wildfly:latest
+                exposedPorts: [8080/tcp]
+            mysql:
+                image: mysql:latest
+                exposedPorts: [3306/tcp]
+                env: [MYSQL_ROOT_PASSWORD=rootpassword, MYSQL_DATABASE=testdb, MYSQL_USER=testuser, MYSQL_PASSWORD=testpassword]
+        </property>
+    </extension>
+</arquillian>
