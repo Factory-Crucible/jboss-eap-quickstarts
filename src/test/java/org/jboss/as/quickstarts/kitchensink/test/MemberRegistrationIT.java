@@ -67,3 +67,87 @@ public class MemberRegistrationIT {
     }
 
 }
+
+    @Test
+    @RunAsClient
+    public void testRegisterWithInvalidEmail() throws Exception {
+        Member newMember = new Member();
+        newMember.setName("John Doe");
+        newMember.setEmail("invalid-email");
+        newMember.setPhoneNumber("1234567890");
+        
+        try {
+            memberRegistration.register(newMember);
+            fail("Expected an exception for invalid email");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Invalid email format"));
+        }
+    }
+
+    @Test
+    @RunAsClient
+    public void testRegisterWithEmptyName() throws Exception {
+        Member newMember = new Member();
+        newMember.setName("");
+        newMember.setEmail("john@example.com");
+        newMember.setPhoneNumber("1234567890");
+        
+        try {
+            memberRegistration.register(newMember);
+            fail("Expected an exception for empty name");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Name cannot be empty"));
+        }
+    }
+
+    @Test
+    @RunAsClient
+    public void testRegisterDuplicateEmail() throws Exception {
+        Member member1 = new Member();
+        member1.setName("John Doe");
+        member1.setEmail("john@example.com");
+        member1.setPhoneNumber("1234567890");
+        memberRegistration.register(member1);
+
+        Member member2 = new Member();
+        member2.setName("Jane Doe");
+        member2.setEmail("john@example.com");
+        member2.setPhoneNumber("9876543210");
+
+        try {
+            memberRegistration.register(member2);
+            fail("Expected an exception for duplicate email");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Email already exists"));
+        }
+    }
+
+    @Test
+    @RunAsClient
+    public void testConcurrentRegistrations() throws Exception {
+        int numThreads = 10;
+        CountDownLatch latch = new CountDownLatch(numThreads);
+        AtomicInteger successCount = new AtomicInteger(0);
+
+        for (int i = 0; i < numThreads; i++) {
+            final int index = i;
+            new Thread(() -> {
+                try {
+                    Member member = new Member();
+                    member.setName("Concurrent User " + index);
+                    member.setEmail("user" + index + "@example.com");
+                    member.setPhoneNumber("123456789" + index);
+                    memberRegistration.register(member);
+                    successCount.incrementAndGet();
+                } catch (Exception e) {
+                    log.warning("Failed to register member: " + e.getMessage());
+                } finally {
+                    latch.countDown();
+                }
+            }).start();
+        }
+
+        latch.await(30, TimeUnit.SECONDS);
+        assertEquals("All concurrent registrations should succeed", numThreads, successCount.get());
+    }
+}
