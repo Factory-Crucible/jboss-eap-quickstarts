@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kitchensink Spring Boot</title>
+    <link rel="stylesheet" th:href="@{/css/screen.css}"/>
+</head>
+<body>
+    <div id="container">
+        <div id="content">
+            <h1>Welcome to Kitchensink Spring Boot!</h1>
+
+            <div th:if="${successMessage}" class="success">
+                <p th:text="${successMessage}"></p>
+            </div>
+
+            <h2>Member Registration</h2>
+            <form th:action="@{/register}" th:object="${newMember}" method="post">
+                <div th:if="${#fields.hasErrors('*')}" class="error">
+                    <p>Please correct the errors below:</p>
+                    <ul>
+                        <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+                    </ul>
+                </div>
+                <table>
+                    <tr>
+                        <th>Name:</th>
+                        <td>
+                            <input type="text" th:field="*{name}" />
+                            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>
+                            <input type="email" th:field="*{email}" />
+                            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Phone #:</th>
+                        <td>
+                            <input type="tel" th:field="*{phoneNumber}" />
+                            <span th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}" class="error"></span>
+                        </td>
+                    </tr>
+                </table>
+                <input type="submit" value="Register" />
+            </form>
+
+            <h2>Members</h2>
+            <table class="simpletablestyle">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone #</th>
+                        <th>REST URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="member : ${members}">
+                        <td th:text="${member.id}"></td>
+                        <td th:text="${member.name}"></td>
+                        <td th:text="${member.email}"></td>
+                        <td th:text="${member.phoneNumber}"></td>
+                        <td><a th:href="@{/rest/members/{id}(id=${member.id})}" th:text="@{/rest/members/{id}(id=${member.id})}"></a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p th:if="${members.isEmpty()}">No members registered yet!</p>
+        </div>
+        <div id="footer">
+            <p>
+                This project was generated from a Maven archetype from
+                JBoss.<br />
+            </p>
+        </div>
+    </div>
+</body>
+</html>
