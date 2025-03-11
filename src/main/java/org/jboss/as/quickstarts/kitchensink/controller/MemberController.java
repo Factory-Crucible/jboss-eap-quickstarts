@@ -21,64 +21,90 @@ import jakarta.enterprise.inject.Model;
 import jakarta.enterprise.inject.Produces;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
+import org.jboss.as.quickstarts.kitchensink.util.ErrorMessageExtractor;
 
-// The @Model stereotype is a convenience mechanism to make this a request-scoped bean that has an
-// EL name
-// Read more about the @Model stereotype in this FAQ:
-// http://www.cdi-spec.org/faq/#accordion6
+/**
+ * Controller responsible for handling member registration operations.
+ * This class serves as a request-scoped bean that manages the lifecycle
+ * of member registration requests and associated UI interactions.
+ */
 @Model
 public class MemberController {
 
-    @Inject
-    private FacesContext facesContext;
-
-    @Inject
-    private MemberRegistration memberRegistration;
-
-    @Produces
-    @Named
+    private final FacesContext facesContext;
+    private final MemberRegistration memberRegistration;
     private Member newMember;
 
+    /**
+     * Constructor for dependency injection.
+     * @param facesContext Context for JSF operations
+     * @param memberRegistration Service for member registration operations
+     */
+    public MemberController(FacesContext facesContext, MemberRegistration memberRegistration) {
+        this.facesContext = facesContext;
+        this.memberRegistration = memberRegistration;
+    }
+
+    /**
+     * Initializes a new Member instance for registration.
+     * Called after dependency injection is complete.
+     */
     @PostConstruct
     public void initNewMember() {
         newMember = new Member();
     }
 
-    public void register() throws Exception {
+    /**
+     * Produces a named member instance for JSF binding.
+     * @return new member instance for registration form
+     */
+    @Produces
+    @Named
+    public Member getNewMember() {
+        return newMember;
+    }
+
+    /**
+     * Handles the member registration process.
+     * Attempts to register a new member and provides appropriate feedback messages.
+     */
+    public void register() {
         try {
             memberRegistration.register(newMember);
-            FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_INFO, "Registered!", "Registration successful");
-            facesContext.addMessage(null, m);
+            displaySuccessMessage();
             initNewMember();
         } catch (Exception e) {
-            String errorMessage = getRootErrorMessage(e);
-            FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_ERROR, errorMessage, "Registration unsuccessful");
-            facesContext.addMessage(null, m);
+            handleRegistrationError(e);
         }
     }
 
-    private String getRootErrorMessage(Exception e) {
-        // Default to general error message that registration failed.
-        String errorMessage = "Registration failed. See server log for more information";
-        if (e == null) {
-            // This shouldn't happen, but return the default messages
-            return errorMessage;
-        }
-
-        // Start with the exception and recurse to find the root cause
-        Throwable t = e;
-        while (t != null) {
-            // Get the message from the Throwable class instance
-            errorMessage = t.getLocalizedMessage();
-            t = t.getCause();
-        }
-        // This is the root cause message
-        return errorMessage;
+    /**
+     * Displays a success message after successful registration.
+     */
+    private void displaySuccessMessage() {
+        FacesMessage m = new FacesMessage(
+            FacesMessage.SEVERITY_INFO,
+            "Registered!",
+            "Registration successful"
+        );
+        facesContext.addMessage(null, m);
     }
 
+    /**
+     * Handles registration errors by displaying appropriate error messages.
+     * @param e Exception thrown during registration
+     */
+    private void handleRegistrationError(Exception e) {
+        String errorMessage = ErrorMessageExtractor.getRootErrorMessage(e);
+        FacesMessage m = new FacesMessage(
+            FacesMessage.SEVERITY_ERROR,
+            errorMessage,
+            "Registration unsuccessful"
+        );
+        facesContext.addMessage(null, m);
+    }
 }
