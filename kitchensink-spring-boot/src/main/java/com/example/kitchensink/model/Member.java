@@ -1,22 +1,18 @@
 package com.example.kitchensink.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "members")
 public class Member {
@@ -31,13 +27,12 @@ public class Member {
     private String name;
 
     @NotNull
+    @NotEmpty
     @Email
-    @Column(unique = true)
     private String email;
 
     @NotNull
     @Size(min = 10, max = 12)
     @Pattern(regexp = "\\d+", message = "Must contain only digits")
-    @Column(name = "phone_number")
     private String phoneNumber;
 }
