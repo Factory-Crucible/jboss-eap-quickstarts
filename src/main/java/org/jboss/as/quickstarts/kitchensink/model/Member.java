@@ -33,6 +33,15 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
+/**
+ * The Member entity represents a registered user in the application.
+ * It demonstrates the use of JPA entity validation using Bean Validation constraints.
+ * Key features include:
+ * - Unique email constraint to prevent duplicate registrations
+ * - Name validation to ensure it contains only letters
+ * - Phone number format validation
+ * - Integration with both JPA for persistence and JAX-RS for REST API exposure
+ */
 @SuppressWarnings("serial")
 @Entity
 @XmlRootElement
