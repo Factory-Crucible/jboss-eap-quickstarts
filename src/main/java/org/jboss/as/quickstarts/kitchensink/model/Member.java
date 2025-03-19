@@ -33,6 +33,18 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
+/**
+ * Member entity class representing a registered user in the system.
+ * This class demonstrates the use of JPA and Bean Validation constraints:
+ * - @NotNull ensures required fields are provided
+ * - @Size controls the length of string fields
+ * - @Pattern with regexp ensures the name contains no numbers
+ * - @Email validates proper email format
+ * - @Digits ensures phone numbers contain only numeric digits
+ * - @Column and @UniqueConstraint handle database-level constraints
+ * These validations help maintain data integrity and provide meaningful
+ * feedback to users when data entry errors occur.
+ */
 @SuppressWarnings("serial")
 @Entity
 @XmlRootElement
