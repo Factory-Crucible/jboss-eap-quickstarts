@@ -1,4 +1,3 @@
-
 # Migration Plan: JBoss 'kitchensink' to Spring Boot with Java 21
 
 ## Table of Contents
