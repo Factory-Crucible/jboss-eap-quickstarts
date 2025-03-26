@@ -1,4 +1,3 @@
-
 # Setup Guide for JBoss 'kitchensink' to Spring Boot Migration
 
 ## Table of Contents
