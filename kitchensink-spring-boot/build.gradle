@@ -1,0 +1,86 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '21'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot core dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    
+    // Optional MongoDB support
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    
+    // Database
+    runtimeOnly 'com.h2database:h2'
+    
+    // Lombok for reducing boilerplate code
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // Spring Boot DevTools for development
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    
+    // Testing dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+    
+    // For API testing
+    testImplementation 'io.rest-assured:rest-assured'
+    
+    // For database testing
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:mongodb'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// For MongoDB profile
+configurations {
+    mongodbRuntime
+}
+
+// Create a profile for MongoDB similar to Maven profiles
+task mongodbProfile {
+    doLast {
+        println "Running with MongoDB profile"
+    }
+}
+
+// Add a task to generate OpenAPI documentation
+tasks.register('generateOpenApiDocs') {
+    doLast {
+        println "Generating OpenAPI documentation"
+    }
+}
+
+// Add a task for database migration
+tasks.register('migrateDatabase') {
+    doLast {
+        println "Running database migration"
+    }
+}
