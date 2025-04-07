@@ -1,0 +1,69 @@
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# Spring Configuration
+spring:
+  # Application Name
+  application:
+    name: kitchensink-spring-boot
+  
+  # Database Configuration
+  datasource:
+    # H2 Database Configuration (for development)
+    url: jdbc:h2:mem:kitchensinkdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  
+  # H2 Console Configuration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+  
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    defer-datasource-initialization: true
+  
+  # MongoDB Configuration (commented out by default)
+  # Uncomment to enable MongoDB
+  #data:
+  #  mongodb:
+  #    host: localhost
+  #    port: 27017
+  #    database: kitchensink
+  
+  # SQL Initialization
+  sql:
+    init:
+      mode: always
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.example.kitchensink: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
