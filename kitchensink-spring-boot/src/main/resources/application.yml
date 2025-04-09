@@ -1,0 +1,114 @@
+spring:
+  application:
+    name: kitchensink
+  profiles:
+    active: dev
+  output:
+    ansi:
+      enabled: always
+
+  # Common datasource configuration
+  datasource:
+    url: jdbc:h2:mem:kitchensink;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  
+  # H2 Console configuration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+  
+  # JPA configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+  
+  # MongoDB configuration
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: kitchensink
+      auto-index-creation: true
+
+  # Jackson configuration for JSON
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+# Server configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /kitchensink
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+
+# Logging configuration
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate: INFO
+    org.jboss.as.quickstarts.kitchensink: DEBUG
+
+# Application-specific configuration
+app:
+  api:
+    base-path: /api
+  cors:
+    allowed-origins: "*"
+    allowed-methods: GET,POST,PUT,DELETE
+    allowed-headers: "*"
+    max-age: 3600
+
+---
+# Development profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    show-sql: true
+  data:
+    mongodb:
+      host: localhost
+
+---
+# Production profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    show-sql: false
+  datasource:
+    url: jdbc:h2:file:./kitchensink;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  data:
+    mongodb:
+      host: mongodb
