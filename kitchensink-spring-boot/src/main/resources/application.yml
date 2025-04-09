@@ -1,0 +1,49 @@
+spring:
+  # Datasource Configuration
+  datasource:
+    url: jdbc:h2:mem:kitchensinkdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  
+  # H2 Console Configuration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+  
+  # Jackson Configuration
+  jackson:
+    serialization:
+      indent-output: true
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# Logging Configuration
+logging:
+  level:
+    org.springframework: INFO
+    com.example.kitchensink: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# Application Information
+info:
+  app:
+    name: Kitchensink Spring Boot
+    description: Spring Boot migration of JBoss Kitchensink application
+    version: 1.0.0
