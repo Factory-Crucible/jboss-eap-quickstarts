@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOGS" value="./logs" />
+    <property name="APP_NAME" value="kitchensink" />
+
+    <!-- Console Appender -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{ISO8601} %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File Appender for all logs -->
+    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/${APP_NAME}.log</file>
+        <encoder>
+            <pattern>%d{ISO8601} %-5level [%thread] %logger{36}: %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS}/archived/${APP_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Error Log File Appender -->
+    <appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/${APP_NAME}-error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>%d{ISO8601} %-5level [%thread] %logger{36}: %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS}/archived/${APP_NAME}-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Async Appenders for improved performance -->
+    <appender name="AsyncRollingFile" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="RollingFile" />
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="AsyncErrorFile" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ErrorFile" />
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <!-- LOG everything at INFO level by default -->
+    <root level="info">
+        <appender-ref ref="Console" />
+        <appender-ref ref="AsyncRollingFile" />
+        <appender-ref ref="AsyncErrorFile" />
+    </root>
+
+    <!-- Application-specific logging configuration -->
+    <logger name="com.example.kitchensink" level="debug" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="AsyncRollingFile" />
+        <appender-ref ref="AsyncErrorFile" />
+    </logger>
+
+    <!-- Spring Framework logging configuration -->
+    <logger name="org.springframework" level="info" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="AsyncRollingFile" />
+        <appender-ref ref="AsyncErrorFile" />
+    </logger>
+
+    <!-- Hibernate logging configuration -->
+    <logger name="org.hibernate.SQL" level="debug" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="AsyncRollingFile" />
+    </logger>
+    
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="trace" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="AsyncRollingFile" />
+    </logger>
+
+    <!-- Spring Boot Actuator logging configuration -->
+    <logger name="org.springframework.boot.actuate" level="info" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="AsyncRollingFile" />
+    </logger>
+
+    <!-- Environment-specific configuration -->
+    <springProfile name="dev">
+        <root level="info">
+            <appender-ref ref="Console" />
+            <appender-ref ref="AsyncRollingFile" />
+            <appender-ref ref="AsyncErrorFile" />
+        </root>
+        <logger name="com.example.kitchensink" level="debug" />
+    </springProfile>
+
+    <springProfile name="prod">
+        <root level="info">
+            <appender-ref ref="AsyncRollingFile" />
+            <appender-ref ref="AsyncErrorFile" />
+        </root>
+        <logger name="com.example.kitchensink" level="info" />
+    </springProfile>
+</configuration>
