@@ -16,69 +16,81 @@
  */
 package org.jboss.as.quickstarts.kitchensink.controller;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.inject.Model;
-import jakarta.enterprise.inject.Produces;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
+import jakarta.validation.Valid;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
-import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
+import org.jboss.as.quickstarts.kitchensink.service.MemberService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-// The @Model stereotype is a convenience mechanism to make this a request-scoped bean that has an
-// EL name
-// Read more about the @Model stereotype in this FAQ:
-// http://www.cdi-spec.org/faq/#accordion6
-@Model
+import java.util.List;
+import java.util.logging.Logger;
+
+/**
+ * REST controller for Member entities.
+ * This replaces the original JAX-RS based MemberResourceRESTService.
+ */
+@RestController
+@RequestMapping("/api/members")
 public class MemberController {
 
-    @Inject
-    private FacesContext facesContext;
+    private final Logger log;
+    private final MemberService memberService;
 
-    @Inject
-    private MemberRegistration memberRegistration;
-
-    @Produces
-    @Named
-    private Member newMember;
-
-    @PostConstruct
-    public void initNewMember() {
-        newMember = new Member();
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param log Logger for logging controller messages
+     * @param memberService Service for member operations
+     */
+    public MemberController(Logger log, MemberService memberService) {
+        this.log = log;
+        this.memberService = memberService;
     }
 
-    public void register() throws Exception {
+    /**
+     * GET endpoint to retrieve all members ordered by name.
+     * 
+     * @return List of all members
+     */
+    @GetMapping
+    public List<Member> getAllMembers() {
+        log.info("Getting all members");
+        return memberService.getAllMembers();
+    }
+
+    /**
+     * GET endpoint to retrieve a specific member by ID.
+     * 
+     * @param id The ID of the member to retrieve
+     * @return The member with the specified ID
+     * @throws ResponseStatusException if the member is not found
+     */
+    @GetMapping("/{id}")
+    public Member getMemberById(@PathVariable Long id) {
+        log.info("Getting member with ID: " + id);
+        return memberService.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Member not found with id: " + id));
+    }
+
+    /**
+     * POST endpoint to create a new member.
+     * 
+     * @param member The member to create
+     * @return ResponseEntity containing the created member and HTTP status
+     */
+    @PostMapping
+    public ResponseEntity<Member> createMember(@Valid @RequestBody Member member) {
         try {
-            memberRegistration.register(newMember);
-            FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_INFO, "Registered!", "Registration successful");
-            facesContext.addMessage(null, m);
-            initNewMember();
+            log.info("Creating new member: " + member.getName());
+            Member savedMember = memberService.register(member);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedMember);
         } catch (Exception e) {
-            String errorMessage = getRootErrorMessage(e);
-            FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_ERROR, errorMessage, "Registration unsuccessful");
-            facesContext.addMessage(null, m);
+            log.warning("Error creating member: " + e.getMessage());
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
-
-    private String getRootErrorMessage(Exception e) {
-        // Default to general error message that registration failed.
-        String errorMessage = "Registration failed. See server log for more information";
-        if (e == null) {
-            // This shouldn't happen, but return the default messages
-            return errorMessage;
-        }
-
-        // Start with the exception and recurse to find the root cause
-        Throwable t = e;
-        while (t != null) {
-            // Get the message from the Throwable class instance
-            errorMessage = t.getLocalizedMessage();
-            t = t.getCause();
-        }
-        // This is the root cause message
-        return errorMessage;
-    }
-
 }
