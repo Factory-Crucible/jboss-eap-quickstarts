@@ -17,29 +17,51 @@
 package org.jboss.as.quickstarts.kitchensink.service;
 
 import org.jboss.as.quickstarts.kitchensink.model.Member;
+import org.jboss.as.quickstarts.kitchensink.repository.MemberRepository;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.ejb.Stateless;
-import jakarta.enterprise.event.Event;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
 import java.util.logging.Logger;
 
-// The @Stateless annotation eliminates the need for manual transaction demarcation
-@Stateless
+/**
+ * Service class for Member registration operations.
+ * This class replaces the original JBoss EAP EJB implementation with a Spring Service.
+ * Uses Spring's @Transactional annotation instead of EJB's container-managed transactions.
+ */
+@Service
 public class MemberRegistration {
 
-    @Inject
-    private Logger log;
+    private final Logger log;
+    private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @Inject
-    private EntityManager em;
+    /**
+     * Constructor injection of dependencies.
+     * This replaces the CDI @Inject annotations in the original implementation.
+     *
+     * @param log the logger instance
+     * @param memberRepository the repository for member persistence
+     * @param eventPublisher the Spring event publisher for firing events
+     */
+    public MemberRegistration(Logger log, MemberRepository memberRepository, 
+                            ApplicationEventPublisher eventPublisher) {
+        this.log = log;
+        this.memberRepository = memberRepository;
+        this.eventPublisher = eventPublisher;
+    }
 
-    @Inject
-    private Event<Member> memberEventSrc;
-
+    /**
+     * Registers a new member in the database and fires a member event.
+     * This method is transactional, replacing the EJB container-managed transaction.
+     *
+     * @param member the member to register
+     * @throws Exception if there is a problem with registration
+     */
+    @Transactional
     public void register(Member member) throws Exception {
         log.info("Registering " + member.getName());
-        em.persist(member);
-        memberEventSrc.fire(member);
+        memberRepository.save(member);
+        eventPublisher.publishEvent(member);
     }
 }
