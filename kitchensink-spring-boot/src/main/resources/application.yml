@@ -1,0 +1,85 @@
+# Common configuration shared between all profiles
+spring:
+  application:
+    name: kitchensink-spring-boot
+
+server:
+  port: 8080
+
+# Default profile configuration (development)
+---
+spring:
+  config:
+    activate:
+      on-profile: default,dev
+  # H2 Database Configuration
+  datasource:
+    url: jdbc:h2:mem:kitchensinkdb
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  # JPA/Hibernate Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    defer-datasource-initialization: true
+  # H2 Console Configuration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  # SQL Initialization
+  sql:
+    init:
+      mode: always
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.example.kitchensink: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.web: INFO
+
+# Production profile configuration
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  # Production Database Configuration (H2 file-based for demo purposes)
+  datasource:
+    url: jdbc:h2:file:./kitchensinkdb;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.h2.Driver
+  # JPA/Hibernate Production Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+  # Disable H2 Console in Production
+  h2:
+    console:
+      enabled: false
+  # SQL Initialization in Production
+  sql:
+    init:
+      mode: never
+
+# Production Logging Configuration
+logging:
+  level:
+    root: WARN
+    com.example.kitchensink: INFO
+    org.springframework.web: WARN
