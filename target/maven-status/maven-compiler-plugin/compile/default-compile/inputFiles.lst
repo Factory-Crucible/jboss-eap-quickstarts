@@ -1,0 +1,8 @@
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/src/main/java/org/jboss/as/quickstarts/kitchensink/service/MemberRegistration.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/src/main/java/org/jboss/as/quickstarts/kitchensink/util/Resources.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/src/main/java/org/jboss/as/quickstarts/kitchensink/data/MemberListProducer.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/src/main/java/org/jboss/as/quickstarts/kitchensink/rest/MemberResourceRESTService.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/src/main/java/org/jboss/as/quickstarts/kitchensink/rest/JaxRsActivator.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/src/main/java/org/jboss/as/quickstarts/kitchensink/data/MemberRepository.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/src/main/java/org/jboss/as/quickstarts/kitchensink/controller/MemberController.java

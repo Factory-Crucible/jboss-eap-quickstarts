@@ -16,21 +16,15 @@
  */
 package org.jboss.as.quickstarts.kitchensink.test;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Logger;
-
-import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.isEmptyString;
 
 public class RemoteMemberRegistrationIT {
-
-    private static final Logger log = Logger.getLogger(RemoteMemberRegistrationIT.class.getName());
 
     protected URI getHTTPEndpoint() {
         String host = getServerHost();
@@ -53,20 +47,20 @@ public class RemoteMemberRegistrationIT {
     }
 
     @Test
-    public void testRegister() {
-        JsonObject json = Json.createObjectBuilder()
-                .add("name", "Jane Doe")
-                .add("email", "jane@mailinator.com")
-                .add("phoneNumber", "2125551234")
-                .build();
+    public void testRegister() throws Exception {
+        String payload = "{" +
+                "\"name\":\"Jane Doe\"," +
+                "\"email\":\"jane@mailinator.com\"," +
+                "\"phoneNumber\":\"2125551234\"" +
+                "}";
 
         given()
             .contentType("application/json")
-            .body(json.toString())
+            .body(payload)
         .when()
-            .post(getHTTPEndpoint().toString())
+            .post(getHTTPEndpoint())
         .then()
             .statusCode(200)
-            .body(equalTo(""));
+            .body(isEmptyString());
     }
 }

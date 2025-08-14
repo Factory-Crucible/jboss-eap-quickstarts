@@ -46,8 +46,7 @@
         <!-- The versions for BOMs, Dependencies and Plugins -->
         <version.server.bom>8.0.0.GA-redhat-00009</version.server.bom>
         <version.eap.maven.plugin>1.0.0.Final-redhat-00014</version.eap.maven.plugin>
-        <version.failsafe.plugin>3.2.5</version.failsafe.plugin>
-  </properties>
+    </properties>
 
     <repositories>
         <!-- keep this repository the first -->
@@ -116,8 +115,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-        
-</dependencies>
+        </dependencies>
     </dependencyManagement>
 
     <dependencies>
@@ -251,18 +249,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>5.4.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <profiles>
