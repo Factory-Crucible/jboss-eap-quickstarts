@@ -1,0 +1,133 @@
+# Common configuration shared between all profiles
+spring:
+  application:
+    name: kitchensink-spring-boot
+  
+  # Default datasource configuration
+  datasource:
+    url: jdbc:h2:mem:kitchensinkdb
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  # JPA/Hibernate configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    show-sql: true
+    defer-datasource-initialization: true
+  
+  # H2 Console configuration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+  
+  # Jackson JSON configuration
+  jackson:
+    serialization:
+      indent-output: true
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+
+# Server configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  error:
+    include-stacktrace: never
+    include-message: always
+
+# Logging configuration
+logging:
+  level:
+    root: INFO
+    org.jboss.as.quickstarts.kitchensink: INFO
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+---
+# Development profile configuration
+spring:
+  config:
+    activate:
+      on-profile: dev
+  
+  # Development-specific datasource settings
+  datasource:
+    url: jdbc:h2:mem:kitchensinkdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  
+  # Enable SQL logging for development
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    org.jboss.as.quickstarts.kitchensink: DEBUG
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+
+---
+# Test profile configuration
+spring:
+  config:
+    activate:
+      on-profile: test
+  
+  # Test-specific datasource settings
+  datasource:
+    url: jdbc:h2:mem:testdb
+  
+  # Test-specific JPA settings
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+---
+# Production profile configuration
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  # Disable H2 console in production
+  h2:
+    console:
+      enabled: false
+  
+  # Production-specific JPA settings
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  # Disable detailed error messages in production
+  server:
+    error:
+      include-stacktrace: never
+      include-message: never
+
+  # Production logging levels
+  logging:
+    level:
+      root: WARN
+      org.jboss.as.quickstarts.kitchensink: INFO
+      org.springframework: WARN
+      org.hibernate: WARN
