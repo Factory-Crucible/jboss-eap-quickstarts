@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: org.jboss.as.quickstarts.kitchensink.KitchensinkApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 15, Failures: 1, Errors: 1, Skipped: 0, Time elapsed: 2.731 s <<< FAILURE! -- in org.jboss.as.quickstarts.kitchensink.KitchensinkApplicationTests
-org.jboss.as.quickstarts.kitchensink.KitchensinkApplicationTests.testServiceRegisterMember -- Time elapsed: 0.044 s <<< ERROR!
+Tests run: 15, Failures: 1, Errors: 1, Skipped: 0, Time elapsed: 2.684 s <<< FAILURE! -- in org.jboss.as.quickstarts.kitchensink.KitchensinkApplicationTests
+org.jboss.as.quickstarts.kitchensink.KitchensinkApplicationTests.testServiceRegisterMember -- Time elapsed: 0.058 s <<< ERROR!
 org.springframework.dao.DataIntegrityViolationException: 
 could not execute statement [Unique index or primary key violation: "PRIMARY KEY ON PUBLIC.MEMBER(ID) ( /* key:1 */ CAST(1 AS BIGINT), '2125551212', 'John Smith', 'john.smith@mailinator.com')"; SQL statement:
 insert into member (email,name,phone_number,id) values (?,?,?,default) [23505-224]] [insert into member (email,name,phone_number,id) values (?,?,?,default)]; SQL [insert into member (email,name,phone_number,id) values (?,?,?,default)]; constraint ["PRIMARY KEY ON PUBLIC.MEMBER(ID) ( /* key:1 */ CAST(1 AS BIGINT), '2125551212', 'John Smith', 'john.smith@mailinator.com')"; SQL statement:
@@ -109,7 +109,7 @@ insert into member (email,name,phone_number,id) values (?,?,?,default) [23505-22
 	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:194)
 	... 71 more
 
-org.jboss.as.quickstarts.kitchensink.KitchensinkApplicationTests.testCreateMember -- Time elapsed: 0.025 s <<< FAILURE!
+org.jboss.as.quickstarts.kitchensink.KitchensinkApplicationTests.testCreateMember -- Time elapsed: 0.024 s <<< FAILURE!
 org.opentest4j.AssertionFailedError: 
 
 expected: 201 CREATED

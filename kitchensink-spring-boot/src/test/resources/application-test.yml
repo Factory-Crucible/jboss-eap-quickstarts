@@ -1,0 +1,43 @@
+# Test-specific configuration for Spring Boot tests
+spring:
+  # Disable data.sql loading to prevent conflicts with test data
+  sql:
+    init:
+      mode: never
+  
+  # Test-specific datasource configuration
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  # JPA/Hibernate test configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+    defer-datasource-initialization: false
+  
+  # Disable H2 Console for tests
+  h2:
+    console:
+      enabled: false
+
+# Server configuration for tests
+server:
+  port: 0  # Use random port for tests to avoid conflicts
+
+# Logging configuration for tests
+logging:
+  level:
+    root: WARN
+    org.jboss.as.quickstarts.kitchensink: INFO
+    org.springframework.test: INFO
+    org.springframework.boot.test: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

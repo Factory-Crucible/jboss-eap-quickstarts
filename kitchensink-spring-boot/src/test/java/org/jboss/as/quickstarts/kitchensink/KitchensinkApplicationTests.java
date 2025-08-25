@@ -3,6 +3,7 @@ package org.jboss.as.quickstarts.kitchensink;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.repository.MemberRepository;
 import org.jboss.as.quickstarts.kitchensink.service.MemberService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -27,15 +28,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Comprehensive integration tests for the Kitchensink Spring Boot application.
  * Tests all layers of the application from REST API to database.
  */
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("Kitchensink Application Integration Tests")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class KitchensinkApplicationTests {
 
     @Autowired
@@ -48,6 +52,21 @@ class KitchensinkApplicationTests {
     private MemberService memberService;
 
     private static final String API_BASE_PATH = "/api/members";
+    
+    // Sample test member data
+    private Member createTestMember(String name, String email, String phone) {
+        Member member = new Member();
+        member.setName(name);
+        member.setEmail(email);
+        member.setPhoneNumber(phone);
+        return member;
+    }
+    
+    @BeforeEach
+    void setup() throws Exception {
+        // Clear any existing data to ensure test isolation
+        memberRepository.deleteAll();
+    }
 
     /**
      * Test that the Spring context loads successfully
@@ -67,16 +86,26 @@ class KitchensinkApplicationTests {
     @Test
     @Order(2)
     @DisplayName("Repository finds all members ordered by name")
-    void testRepositoryFindAllOrderedByName() {
+    void testRepositoryFindAllOrderedByName() throws Exception {
+        // Initially the database should be empty
+        List<Member> initialMembers = memberRepository.findAllOrderedByName();
+        assertThat(initialMembers).isEmpty();
+        
+        // Create test members in non-alphabetical order
+        memberService.register(createTestMember("Charlie Brown", "charlie@example.com", "5551112222"));
+        memberService.register(createTestMember("Alice Smith", "alice@example.com", "5553334444"));
+        memberService.register(createTestMember("Bob Johnson", "bob@example.com", "5555556666"));
+        
+        // Get members and verify ordering
         List<Member> members = memberRepository.findAllOrderedByName();
         
         assertThat(members).isNotEmpty();
-        assertThat(members.size()).isGreaterThanOrEqualTo(5); // We have 5 members in data.sql
+        assertThat(members.size()).isEqualTo(3);
         
-        // Verify ordering by name
-        for (int i = 0; i < members.size() - 1; i++) {
-            assertThat(members.get(i).getName().compareTo(members.get(i + 1).getName())).isLessThanOrEqualTo(0);
-        }
+        // Verify ordering by name (alphabetical)
+        assertThat(members.get(0).getName()).isEqualTo("Alice Smith");
+        assertThat(members.get(1).getName()).isEqualTo("Bob Johnson");
+        assertThat(members.get(2).getName()).isEqualTo("Charlie Brown");
     }
 
     /**
@@ -85,12 +114,17 @@ class KitchensinkApplicationTests {
     @Test
     @Order(3)
     @DisplayName("Repository finds member by email")
-    void testRepositoryFindByEmail() {
-        Member member = memberRepository.findByEmail("john.smith@mailinator.com");
+    void testRepositoryFindByEmail() throws Exception {
+        // Create a test member first
+        Member testMember = createTestMember("John Smith", "john.smith@mailinator.com", "2125551212");
+        memberService.register(testMember);
         
-        assertThat(member).isNotNull();
-        assertThat(member.getName()).isEqualTo("John Smith");
-        assertThat(member.getPhoneNumber()).isEqualTo("2125551212");
+        // Now find the member by email
+        Member foundMember = memberRepository.findByEmail("john.smith@mailinator.com");
+        
+        assertThat(foundMember).isNotNull();
+        assertThat(foundMember.getName()).isEqualTo("John Smith");
+        assertThat(foundMember.getPhoneNumber()).isEqualTo("2125551212");
     }
 
     /**
@@ -110,7 +144,6 @@ class KitchensinkApplicationTests {
     @Test
     @Order(5)
     @DisplayName("Service registers new member successfully")
-    @DirtiesContext
     void testServiceRegisterMember() throws Exception {
         Member newMember = new Member();
         newMember.setName("Test User");
@@ -135,7 +168,12 @@ class KitchensinkApplicationTests {
     @Test
     @Order(6)
     @DisplayName("Service throws exception for duplicate email")
-    void testServiceRegisterDuplicateEmail() {
+    void testServiceRegisterDuplicateEmail() throws Exception {
+        // Create the initial member first
+        Member initialMember = createTestMember("John Smith", "john.smith@mailinator.com", "2125551212");
+        memberService.register(initialMember);
+        
+        // Now try to create a duplicate
         Member duplicateMember = new Member();
         duplicateMember.setName("Another John");
         duplicateMember.setEmail("john.smith@mailinator.com"); // This email already exists
@@ -154,7 +192,25 @@ class KitchensinkApplicationTests {
     @Test
     @Order(7)
     @DisplayName("REST API returns all members")
-    void testGetAllMembers() {
+    void testGetAllMembers() throws Exception {
+        // Initially there should be no members
+        ResponseEntity<List<Member>> initialResponse = restTemplate.exchange(
+                API_BASE_PATH,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<Member>>() {}
+        );
+        
+        assertThat(initialResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(initialResponse.getBody()).isNotNull();
+        assertThat(initialResponse.getBody()).isEmpty();
+        
+        // Create some test members
+        memberService.register(createTestMember("John Smith", "john@example.com", "5551112222"));
+        memberService.register(createTestMember("Jane Doe", "jane@example.com", "5553334444"));
+        memberService.register(createTestMember("Bob Johnson", "bob@example.com", "5555556666"));
+        
+        // Now get all members
         ResponseEntity<List<Member>> response = restTemplate.exchange(
                 API_BASE_PATH,
                 HttpMethod.GET,
@@ -164,7 +220,7 @@ class KitchensinkApplicationTests {
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().size()).isGreaterThanOrEqualTo(5);
+        assertThat(response.getBody().size()).isEqualTo(3);
     }
 
     /**
@@ -173,15 +229,21 @@ class KitchensinkApplicationTests {
     @Test
     @Order(8)
     @DisplayName("REST API returns member by ID")
-    void testGetMemberById() {
+    void testGetMemberById() throws Exception {
+        // Create a test member first
+        Member testMember = createTestMember("John Smith", "john@example.com", "2125551212");
+        Member savedMember = memberService.register(testMember);
+        Long memberId = savedMember.getId();
+        
+        // Now get the member by ID
         ResponseEntity<Member> response = restTemplate.getForEntity(
-                API_BASE_PATH + "/1",
+                API_BASE_PATH + "/" + memberId,
                 Member.class
         );
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getId()).isEqualTo(1L);
+        assertThat(response.getBody().getId()).isEqualTo(memberId);
         assertThat(response.getBody().getName()).isEqualTo("John Smith");
     }
 
@@ -208,7 +270,6 @@ class KitchensinkApplicationTests {
     @Test
     @Order(10)
     @DisplayName("REST API creates new member successfully")
-    @DirtiesContext
     void testCreateMember() {
         Member newMember = new Member();
         newMember.setName("API Test User");
@@ -263,7 +324,12 @@ class KitchensinkApplicationTests {
     @Test
     @Order(12)
     @DisplayName("REST API returns 409 for duplicate email")
-    void testCreateMemberWithDuplicateEmail() {
+    void testCreateMemberWithDuplicateEmail() throws Exception {
+        // Create the initial member first
+        Member initialMember = createTestMember("John Smith", "john.smith@mailinator.com", "2125551212");
+        memberService.register(initialMember);
+        
+        // Now try to create a duplicate
         Member duplicateMember = new Member();
         duplicateMember.setName("Duplicate Email User");
         duplicateMember.setEmail("john.smith@mailinator.com"); // This email already exists
