@@ -1,0 +1,45 @@
+# Server Configuration
+server:
+  port: 8080
+
+# Spring Configuration
+spring:
+  # H2 Database Configuration
+  datasource:
+    url: jdbc:h2:mem:kitchensinkdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+  
+  # H2 Console Configuration (for development)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # JPA/Hibernate Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    # Ensure data.sql runs AFTER Hibernate auto-creates the schema
+    defer-datasource-initialization: true
+  
+  # SQL Initialization Configuration
+  sql:
+    init:
+      # Run data.sql only when using an embedded database so that
+      # tables created by Hibernate exist before the script executes.
+      mode: embedded
+      platform: h2
+      data-locations: classpath:data.sql
+
+# Logging Configuration
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
