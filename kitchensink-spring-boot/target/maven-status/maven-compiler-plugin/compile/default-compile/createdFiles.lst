@@ -1,8 +1,0 @@
-com/factory/kitchensink/service/MemberService$DuplicateEmailException.class
-com/factory/kitchensink/exception/GlobalExceptionHandler.class
-com/factory/kitchensink/service/MemberService$MemberNotFoundException.class
-com/factory/kitchensink/model/Member.class
-com/factory/kitchensink/repository/MemberRepository.class
-com/factory/kitchensink/KitchensinkApplication.class
-com/factory/kitchensink/controller/MemberController.class
-com/factory/kitchensink/service/MemberService.class
