@@ -1,0 +1,7 @@
+org/jboss/as/quickstarts/kitchensink/spring/service/MemberService$UniqueEmailViolation.class
+org/jboss/as/quickstarts/kitchensink/spring/web/MemberRestController.class
+org/jboss/as/quickstarts/kitchensink/spring/repository/MemberRepository.class
+org/jboss/as/quickstarts/kitchensink/spring/KitchensinkApplication.class
+org/jboss/as/quickstarts/kitchensink/spring/model/Member.class
+org/jboss/as/quickstarts/kitchensink/spring/web/RestExceptionHandler.class
+org/jboss/as/quickstarts/kitchensink/spring/service/MemberService.class
