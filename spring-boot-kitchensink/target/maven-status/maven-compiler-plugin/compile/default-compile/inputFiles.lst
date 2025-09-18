@@ -1,0 +1,8 @@
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/spring-boot-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/SpringBootKitchensinkApplication.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/spring-boot-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/model/Member.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/spring-boot-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/repository/MemberRepository.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/spring-boot-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/service/DuplicateEmailException.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/spring-boot-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/service/MemberService.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/spring-boot-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/web/MemberController.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/spring-boot-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/web/ResourceNotFoundException.java
+/Users/eric/Documents/GitHub/jboss-eap-quickstarts/spring-boot-kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/web/RestExceptionHandler.java

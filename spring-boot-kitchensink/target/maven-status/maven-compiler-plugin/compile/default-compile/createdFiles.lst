@@ -1,0 +1,8 @@
+org/jboss/as/quickstarts/kitchensink/web/RestExceptionHandler.class
+org/jboss/as/quickstarts/kitchensink/SpringBootKitchensinkApplication.class
+org/jboss/as/quickstarts/kitchensink/web/MemberController.class
+org/jboss/as/quickstarts/kitchensink/service/DuplicateEmailException.class
+org/jboss/as/quickstarts/kitchensink/model/Member.class
+org/jboss/as/quickstarts/kitchensink/web/ResourceNotFoundException.class
+org/jboss/as/quickstarts/kitchensink/repository/MemberRepository.class
+org/jboss/as/quickstarts/kitchensink/service/MemberService.class
